@@ -157,12 +157,87 @@
 
 	qcom,panel-supply-entries = <&dsi_panel_pwr_supply_amoled>;
 	qcom,mdss-dsi-no-panel-on-read-support;
-    qcom,mdss-dsi-bl-remap;
+	qcom,mdss-dsi-bl-remap;
 	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
 	qcom,mdss-dsi-bl-min-level = <9>;
-	qcom,mdss-dsi-bl-max-level = <3514>;
+	qcom,mdss-dsi-bl-max-level = <4095>;
 	qcom,mdss-dsi-bl-default-level = <1757>;
-	qcom,mdss-brightness-max-level = <3514>;
+	qcom,mdss-brightness-max-level = <4095>;
+	qcom,fod-dim-lut = <
+		/* brightness, alpha */
+		0	255
+		9	237
+		59	236
+		110	235
+		161	234
+		212	232
+		262	231
+		313	230
+		364	229
+		415	227
+		466	224
+		516	221
+		567	218
+		618	215
+		669	212
+		720	209
+		770	205
+		821	202
+		872	199
+		923	196
+		974	193
+		1024	190
+		1075	187
+		1126	184
+		1177	181
+		1228	178
+		1278	175
+		1329	172
+		1380	169
+		1431	166
+		1482	163
+		1532	160
+		1583	157
+		1634	154
+		1685	151
+		1736	148
+		1786	145
+		1837	142
+		1888	139
+		1939	136
+		1990	133
+		2040	130
+		2091	127
+		2142	124
+		2193	121
+		2244	118
+		2294	115
+		2345	112
+		2396	109
+		2447	106
+		2498	103
+		2548	100
+		2599	96
+		2650	90
+		2701	85
+		2752	82
+		2802	78
+		2853	76
+		2904	73
+		2955	70
+		3006	68
+		3056	65
+		3107	62
+		3158	58
+		3209	54
+		3260	50
+		3310	48
+		3361	44
+		3412	40
+		3463	36
+		3514	32
+		4095	0
+	>;
 	qcom,platform-reset-gpio = <&tlmm 24 0>;
 	qcom,bl-dsc-cmd-state = "dsi_hs_mode";
 
@@ -222,13 +297,88 @@
 	qcom,mdss-dsi-panel-status-read-length = <1>;
 
 	qcom,panel-supply-entries = <&dsi_panel_pwr_supply_amoled>;
+	qcom,mdss-dsi-bl-remap;
 	qcom,mdss-dsi-no-panel-on-read-support;
-    qcom,mdss-dsi-bl-remap;
 	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
 	qcom,mdss-dsi-bl-min-level = <9>;
-	qcom,mdss-dsi-bl-max-level = <3514>;
+	qcom,mdss-dsi-bl-max-level = <4095>;
 	qcom,mdss-dsi-bl-default-level = <1757>;
-	qcom,mdss-brightness-max-level = <3514>;
+	qcom,mdss-brightness-max-level = <4095>;
+	qcom,fod-dim-lut = <
+		/* brightness, alpha */
+		0	255
+		9	237
+		59	236
+		110	235
+		161	234
+		212	232
+		262	231
+		313	230
+		364	229
+		415	227
+		466	224
+		516	221
+		567	218
+		618	215
+		669	212
+		720	209
+		770	205
+		821	202
+		872	199
+		923	196
+		974	193
+		1024	190
+		1075	187
+		1126	184
+		1177	181
+		1228	178
+		1278	175
+		1329	172
+		1380	169
+		1431	166
+		1482	163
+		1532	160
+		1583	157
+		1634	154
+		1685	151
+		1736	148
+		1786	145
+		1837	142
+		1888	139
+		1939	136
+		1990	133
+		2040	130
+		2091	127
+		2142	124
+		2193	121
+		2244	118
+		2294	115
+		2345	112
+		2396	109
+		2447	106
+		2498	103
+		2548	100
+		2599	96
+		2650	90
+		2701	85
+		2752	82
+		2802	78
+		2853	76
+		2904	73
+		2955	70
+		3006	68
+		3056	65
+		3107	62
+		3158	58
+		3209	54
+		3260	50
+		3310	48
+		3361	44
+		3412	40
+		3463	36
+		3514	32
+		4095	0
+	>;
 	qcom,platform-reset-gpio = <&tlmm 24 0>;
 	qcom,bl-dsc-cmd-state = "dsi_hs_mode";
 
@@ -289,12 +439,87 @@
 
 	qcom,panel-supply-entries = <&dsi_panel_pwr_supply_amoled>;
 	qcom,mdss-dsi-no-panel-on-read-support;
-    qcom,mdss-dsi-bl-remap;
+	qcom,mdss-dsi-bl-remap;
 	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
 	qcom,mdss-dsi-bl-min-level = <9>;
-	qcom,mdss-dsi-bl-max-level = <3513>;
+	qcom,mdss-dsi-bl-max-level = <4095>;
 	qcom,mdss-dsi-bl-default-level = <1757>;
-	qcom,mdss-brightness-max-level = <3513>;
+	qcom,mdss-brightness-max-level = <4095>;
+	qcom,fod-dim-lut = <
+		/* brightness, alpha */
+		0	255
+		9	237
+		59	236
+		110	235
+		161	234
+		212	232
+		262	231
+		313	230
+		364	229
+		415	227
+		466	224
+		516	221
+		567	218
+		618	215
+		669	212
+		720	209
+		770	205
+		821	202
+		872	199
+		923	196
+		974	193
+		1024	190
+		1075	187
+		1126	184
+		1177	181
+		1228	178
+		1278	175
+		1329	172
+		1380	169
+		1431	166
+		1482	163
+		1532	160
+		1583	157
+		1634	154
+		1685	151
+		1736	148
+		1786	145
+		1837	142
+		1888	139
+		1939	136
+		1990	133
+		2040	130
+		2091	127
+		2142	124
+		2193	121
+		2244	118
+		2294	115
+		2345	112
+		2396	109
+		2447	106
+		2498	103
+		2548	100
+		2599	96
+		2650	90
+		2701	85
+		2752	82
+		2802	78
+		2853	76
+		2904	73
+		2955	70
+		3006	68
+		3056	65
+		3107	62
+		3158	58
+		3209	54
+		3260	50
+		3310	48
+		3361	44
+		3412	40
+		3463	36
+		3514	32
+		4095	0
+	>;
 	qcom,platform-reset-gpio = <&tlmm 24 0>;
 	qcom,bl-dsc-cmd-state = "dsi_hs_mode";
 
@@ -355,12 +580,87 @@
 
 	qcom,panel-supply-entries = <&dsi_panel_pwr_supply_amoled>;
 	qcom,mdss-dsi-no-panel-on-read-support;
-    qcom,mdss-dsi-bl-remap;
+	qcom,mdss-dsi-bl-remap;
 	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
 	qcom,mdss-dsi-bl-min-level = <9>;
-	qcom,mdss-dsi-bl-max-level = <3513>;
+	qcom,mdss-dsi-bl-max-level = <4095>;
 	qcom,mdss-dsi-bl-default-level = <1757>;
-	qcom,mdss-brightness-max-level = <3513>;
+	qcom,mdss-brightness-max-level = <4095>;
+	qcom,fod-dim-lut = <
+		/* brightness, alpha */
+		0	255
+		9	237
+		59	236
+		110	235
+		161	234
+		212	232
+		262	231
+		313	230
+		364	229
+		415	227
+		466	224
+		516	221
+		567	218
+		618	215
+		669	212
+		720	209
+		770	205
+		821	202
+		872	199
+		923	196
+		974	193
+		1024	190
+		1075	187
+		1126	184
+		1177	181
+		1228	178
+		1278	175
+		1329	172
+		1380	169
+		1431	166
+		1482	163
+		1532	160
+		1583	157
+		1634	154
+		1685	151
+		1736	148
+		1786	145
+		1837	142
+		1888	139
+		1939	136
+		1990	133
+		2040	130
+		2091	127
+		2142	124
+		2193	121
+		2244	118
+		2294	115
+		2345	112
+		2396	109
+		2447	106
+		2498	103
+		2548	100
+		2599	96
+		2650	90
+		2701	85
+		2752	82
+		2802	78
+		2853	76
+		2904	73
+		2955	70
+		3006	68
+		3056	65
+		3107	62
+		3158	58
+		3209	54
+		3260	50
+		3310	48
+		3361	44
+		3412	40
+		3463	36
+		3514	32
+		4095	0
+	>;
 	qcom,platform-reset-gpio = <&tlmm 24 0>;
 	qcom,bl-dsc-cmd-state = "dsi_hs_mode";
 
@@ -421,12 +721,87 @@
 
 	qcom,panel-supply-entries = <&dsi_panel_pwr_supply_amoled>;
 	qcom,mdss-dsi-no-panel-on-read-support;
-    qcom,mdss-dsi-bl-remap;
+	qcom,mdss-dsi-bl-remap;
 	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
 	qcom,mdss-dsi-bl-min-level = <9>;
-	qcom,mdss-dsi-bl-max-level = <3514>;
+	qcom,mdss-dsi-bl-max-level = <4095>;
 	qcom,mdss-dsi-bl-default-level = <1757>;
-	qcom,mdss-brightness-max-level = <3514>;
+	qcom,mdss-brightness-max-level = <4095>;
+	qcom,fod-dim-lut = <
+		/* brightness, alpha */
+		0	255
+		9	237
+		59	236
+		110	235
+		161	234
+		212	232
+		262	231
+		313	230
+		364	229
+		415	227
+		466	224
+		516	221
+		567	218
+		618	215
+		669	212
+		720	209
+		770	205
+		821	202
+		872	199
+		923	196
+		974	193
+		1024	190
+		1075	187
+		1126	184
+		1177	181
+		1228	178
+		1278	175
+		1329	172
+		1380	169
+		1431	166
+		1482	163
+		1532	160
+		1583	157
+		1634	154
+		1685	151
+		1736	148
+		1786	145
+		1837	142
+		1888	139
+		1939	136
+		1990	133
+		2040	130
+		2091	127
+		2142	124
+		2193	121
+		2244	118
+		2294	115
+		2345	112
+		2396	109
+		2447	106
+		2498	103
+		2548	100
+		2599	96
+		2650	90
+		2701	85
+		2752	82
+		2802	78
+		2853	76
+		2904	73
+		2955	70
+		3006	68
+		3056	65
+		3107	62
+		3158	58
+		3209	54
+		3260	50
+		3310	48
+		3361	44
+		3412	40
+		3463	36
+		3514	32
+		4095	0
+	>;
 	qcom,platform-reset-gpio = <&tlmm 24 0>;
 	qcom,bl-dsc-cmd-state = "dsi_hs_mode";
 
@@ -487,12 +862,87 @@
 
 	qcom,panel-supply-entries = <&dsi_panel_pwr_supply_amoled>;
 	qcom,mdss-dsi-no-panel-on-read-support;
-    qcom,mdss-dsi-bl-remap;
+	qcom,mdss-dsi-bl-remap;
 	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
 	qcom,mdss-dsi-bl-min-level = <9>;
-	qcom,mdss-dsi-bl-max-level = <3514>;
+	qcom,mdss-dsi-bl-max-level = <4095>;
 	qcom,mdss-dsi-bl-default-level = <1757>;
-	qcom,mdss-brightness-max-level = <3514>;
+	qcom,mdss-brightness-max-level = <4095>;
+	qcom,fod-dim-lut = <
+		/* brightness, alpha */
+		0	255
+		9	237
+		59	236
+		110	235
+		161	234
+		212	232
+		262	231
+		313	230
+		364	229
+		415	227
+		466	224
+		516	221
+		567	218
+		618	215
+		669	212
+		720	209
+		770	205
+		821	202
+		872	199
+		923	196
+		974	193
+		1024	190
+		1075	187
+		1126	184
+		1177	181
+		1228	178
+		1278	175
+		1329	172
+		1380	169
+		1431	166
+		1482	163
+		1532	160
+		1583	157
+		1634	154
+		1685	151
+		1736	148
+		1786	145
+		1837	142
+		1888	139
+		1939	136
+		1990	133
+		2040	130
+		2091	127
+		2142	124
+		2193	121
+		2244	118
+		2294	115
+		2345	112
+		2396	109
+		2447	106
+		2498	103
+		2548	100
+		2599	96
+		2650	90
+		2701	85
+		2752	82
+		2802	78
+		2853	76
+		2904	73
+		2955	70
+		3006	68
+		3056	65
+		3107	62
+		3158	58
+		3209	54
+		3260	50
+		3310	48
+		3361	44
+		3412	40
+		3463	36
+		3514	32
+		4095	0
+	>;
 	qcom,platform-reset-gpio = <&tlmm 24 0>;
 	qcom,bl-dsc-cmd-state = "dsi_hs_mode";
 
@@ -553,12 +1003,87 @@
 
 	qcom,panel-supply-entries = <&dsi_panel_pwr_supply_amoled>;
 	qcom,mdss-dsi-no-panel-on-read-support;
-    qcom,mdss-dsi-bl-remap;
+	qcom,mdss-dsi-bl-remap;
 	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
 	qcom,mdss-dsi-bl-min-level = <9>;
-	qcom,mdss-dsi-bl-max-level = <3514>;
+	qcom,mdss-dsi-bl-max-level = <4095>;
 	qcom,mdss-dsi-bl-default-level = <1757>;
-	qcom,mdss-brightness-max-level = <3514>;
+	qcom,mdss-brightness-max-level = <4095>;
+	qcom,fod-dim-lut = <
+		/* brightness, alpha */
+		0	255
+		9	237
+		59	236
+		110	235
+		161	234
+		212	232
+		262	231
+		313	230
+		364	229
+		415	227
+		466	224
+		516	221
+		567	218
+		618	215
+		669	212
+		720	209
+		770	205
+		821	202
+		872	199
+		923	196
+		974	193
+		1024	190
+		1075	187
+		1126	184
+		1177	181
+		1228	178
+		1278	175
+		1329	172
+		1380	169
+		1431	166
+		1482	163
+		1532	160
+		1583	157
+		1634	154
+		1685	151
+		1736	148
+		1786	145
+		1837	142
+		1888	139
+		1939	136
+		1990	133
+		2040	130
+		2091	127
+		2142	124
+		2193	121
+		2244	118
+		2294	115
+		2345	112
+		2396	109
+		2447	106
+		2498	103
+		2548	100
+		2599	96
+		2650	90
+		2701	85
+		2752	82
+		2802	78
+		2853	76
+		2904	73
+		2955	70
+		3006	68
+		3056	65
+		3107	62
+		3158	58
+		3209	54
+		3260	50
+		3310	48
+		3361	44
+		3412	40
+		3463	36
+		3514	32
+		4095	0
+	>;
 	qcom,platform-reset-gpio = <&tlmm 24 0>;
 	qcom,bl-dsc-cmd-state = "dsi_hs_mode";
 
@@ -619,12 +1144,87 @@
 
 	qcom,panel-supply-entries = <&dsi_panel_pwr_supply_amoled>;
 	qcom,mdss-dsi-no-panel-on-read-support;
-    qcom,mdss-dsi-bl-remap;
+	qcom,mdss-dsi-bl-remap;
 	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
 	qcom,mdss-dsi-bl-min-level = <9>;
-	qcom,mdss-dsi-bl-max-level = <3514>;
+	qcom,mdss-dsi-bl-max-level = <4095>;
 	qcom,mdss-dsi-bl-default-level = <1757>;
-	qcom,mdss-brightness-max-level = <3514>;
+	qcom,mdss-brightness-max-level = <4095>;
+	qcom,fod-dim-lut = <
+		/* brightness, alpha */
+		0	255
+		9	237
+		59	236
+		110	235
+		161	234
+		212	232
+		262	231
+		313	230
+		364	229
+		415	227
+		466	224
+		516	221
+		567	218
+		618	215
+		669	212
+		720	209
+		770	205
+		821	202
+		872	199
+		923	196
+		974	193
+		1024	190
+		1075	187
+		1126	184
+		1177	181
+		1228	178
+		1278	175
+		1329	172
+		1380	169
+		1431	166
+		1482	163
+		1532	160
+		1583	157
+		1634	154
+		1685	151
+		1736	148
+		1786	145
+		1837	142
+		1888	139
+		1939	136
+		1990	133
+		2040	130
+		2091	127
+		2142	124
+		2193	121
+		2244	118
+		2294	115
+		2345	112
+		2396	109
+		2447	106
+		2498	103
+		2548	100
+		2599	96
+		2650	90
+		2701	85
+		2752	82
+		2802	78
+		2853	76
+		2904	73
+		2955	70
+		3006	68
+		3056	65
+		3107	62
+		3158	58
+		3209	54
+		3260	50
+		3310	48
+		3361	44
+		3412	40
+		3463	36
+		3514	32
+		4095	0
+	>;
 	qcom,platform-reset-gpio = <&tlmm 24 0>;
 	qcom,bl-dsc-cmd-state = "dsi_hs_mode";
 
@@ -685,12 +1285,87 @@
 
 	qcom,panel-supply-entries = <&dsi_panel_pwr_supply_amoled>;
 	qcom,mdss-dsi-no-panel-on-read-support;
-    qcom,mdss-dsi-bl-remap;
+	qcom,mdss-dsi-bl-remap;
 	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
 	qcom,mdss-dsi-bl-min-level = <9>;
-	qcom,mdss-dsi-bl-max-level = <3514>;
+	qcom,mdss-dsi-bl-max-level = <4095>;
 	qcom,mdss-dsi-bl-default-level = <1757>;
-	qcom,mdss-brightness-max-level = <3514>;
+	qcom,mdss-brightness-max-level = <4095>;
+	qcom,fod-dim-lut = <
+		/* brightness, alpha */
+		0	255
+		9	237
+		59	236
+		110	235
+		161	234
+		212	232
+		262	231
+		313	230
+		364	229
+		415	227
+		466	224
+		516	221
+		567	218
+		618	215
+		669	212
+		720	209
+		770	205
+		821	202
+		872	199
+		923	196
+		974	193
+		1024	190
+		1075	187
+		1126	184
+		1177	181
+		1228	178
+		1278	175
+		1329	172
+		1380	169
+		1431	166
+		1482	163
+		1532	160
+		1583	157
+		1634	154
+		1685	151
+		1736	148
+		1786	145
+		1837	142
+		1888	139
+		1939	136
+		1990	133
+		2040	130
+		2091	127
+		2142	124
+		2193	121
+		2244	118
+		2294	115
+		2345	112
+		2396	109
+		2447	106
+		2498	103
+		2548	100
+		2599	96
+		2650	90
+		2701	85
+		2752	82
+		2802	78
+		2853	76
+		2904	73
+		2955	70
+		3006	68
+		3056	65
+		3107	62
+		3158	58
+		3209	54
+		3260	50
+		3310	48
+		3361	44
+		3412	40
+		3463	36
+		3514	32
+		4095	0
+	>;
 	qcom,platform-reset-gpio = <&tlmm 24 0>;
 	qcom,bl-dsc-cmd-state = "dsi_hs_mode";
 
