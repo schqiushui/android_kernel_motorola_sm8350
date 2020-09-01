@@ -1,10 +1,21 @@
 # add -Wall to try to catch everything we can.
 EXTRA_CFLAGS += -Wall
-EXTRA_CFLAGS += -I$(ANDROID_BUILD_TOP)/vendor/cirrus/audio/dlkm/include
+EXTRA_CFLAGS += \
+	-I$(ANDROID_BUILD_TOP)/vendor/cirrus/audio/dlkm/include \
+	-I$(ANDROID_BUILD_TOP)/vendor/cirrus/audio/dlkm/sound/soc/wm_adsp
 
 ifneq ($(filter m y,$(CONFIG_SND_SOC_CS35L41_I2C)),)
-cirrus_cs35l41-objs = cs35l41.o cs35l41-tables.o wm_adsp.o cs35l41-i2c.o
+cirrus_cs35l41-objs = cs35l41.o cs35l41-tables.o cs35l41-i2c.o
 else
-cirrus_cs35l41-objs = cs35l41.o cs35l41-tables.o wm_adsp.o cs35l41-spi.o
+cirrus_cs35l41-objs = cs35l41.o cs35l41-tables.o cs35l41-spi.o
 endif
 obj-m += cirrus_cs35l41.o
+
+ifneq ($(filter m y,$(CONFIG_SND_SOC_CS35L45_I2C)),)
+cirrus_cs35l45-objs = cs35l45.o cs35l45-tables.o cs35l45-i2c.o
+else
+cirrus_cs35l45-objs = cs35l45.o cs35l45-tables.o cs35l45-spi.o
+endif
+obj-m += cirrus_cs35l45.o
+
+KBUILD_EXTRA_SYMBOLS += $(CURDIR)/$(KBUILD_EXTMOD)/../wm_adsp/Module.symvers
