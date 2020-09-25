@@ -622,9 +622,6 @@ static const struct snd_kcontrol_new ngate_en_ctl =
 static const struct snd_kcontrol_new nfr_en_ctl =
 	SOC_DAPM_SINGLE("Switch", SND_SOC_NOPM, 0, 1, 0);
 
-static const struct snd_kcontrol_new sync_pwr_en_ctl =
-	SOC_DAPM_SINGLE("Switch", SND_SOC_NOPM, 0, 1, 0);
-
 static const struct snd_soc_dapm_widget cs35l45_dapm_widgets[] = {
 	SND_SOC_DAPM_SPK("DSP1 Preload", NULL),
 	SND_SOC_DAPM_SPK("DSP1 Enable", NULL),
