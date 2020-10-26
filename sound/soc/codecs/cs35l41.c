@@ -2768,7 +2768,7 @@ static int cs35l41_handle_of_data(struct device *dev,
 	if (!np)
 		return 0;
 
-	cs35l41->dt_name = devm_kstrdup_const(cs35l41->dev, np->name,
+	cs35l41->dt_name = devm_kstrdup(cs35l41->dev, np->name,
 					      GFP_KERNEL);
 
 	ret = of_property_count_strings(np, "cirrus,fast-switch");
