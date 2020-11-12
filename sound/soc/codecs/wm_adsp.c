@@ -1551,7 +1551,7 @@ static int wm_adsp_create_control(struct wm_adsp *dsp,
 		break;
 	default:
 		ret = scnprintf(name, SNDRV_CTL_ELEM_ID_NAME_MAXLEN,
-				"%s %.12s %x", dsp->name,
+				"%s%c %.12s %x", dsp->name, *region_name,
 				fw_txt, alg_region->alg);
 		break;
 	}
