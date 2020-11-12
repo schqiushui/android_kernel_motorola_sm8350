@@ -53,6 +53,16 @@ struct wm_adsp_compr;
 struct wm_adsp_compr_buf;
 struct wm_adsp_ops;
 
+struct wm_adsp_fw_defs {
+	const char *file;
+	const char *binfile;
+	bool fullname;
+	int compr_direction;
+	int num_caps;
+	struct wm_adsp_fw_caps *caps;
+	bool voice_trigger;
+};
+
 struct wm_adsp {
 	const char *part;
 	const char *name;
@@ -89,6 +99,11 @@ struct wm_adsp {
 	bool booted;
 	bool running;
 	bool fatal_error;
+
+	int num_firmwares;
+	struct wm_adsp_fw_defs *firmwares;
+	struct snd_kcontrol_new fw_ctrl;
+	struct soc_enum fw_enum;
 
 	struct list_head ctl_list;
 

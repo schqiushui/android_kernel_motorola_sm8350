@@ -1395,7 +1395,6 @@ static const struct snd_kcontrol_new cs35l41_aud_controls[] = {
 					CS35L41_BSTCVRT_VCTRL2, 0, 1, 0),
 	SOC_SINGLE("Boost Target Voltage", CS35L41_BSTCVRT_VCTRL1, 0, 0xAA, 0),
 	WM_ADSP2_PRELOAD_SWITCH("DSP1", 1),
-	WM_ADSP_FW_CONTROL("DSP1", 0),
 	SOC_SINGLE_BOOL_EXT("Safety Volume Ramp Status", 0,
 			    cs35l41_get_ramp_status, cs35l41_put_ramp_status),
 	SOC_SINGLE_BOOL_EXT("Manual Ramp Control", 0,

@@ -1173,7 +1173,6 @@ static int cs35l45_sync_id_put(struct snd_kcontrol *kcontrol,
 }
 
 static const struct snd_kcontrol_new cs35l45_aud_controls[] = {
-	WM_ADSP_FW_CONTROL("DSP1", 0),
 	WM_ADSP2_PRELOAD_SWITCH("DSP1", 1),
 
 	SOC_SINGLE("AMP Mute", CS35L45_AMP_OUTPUT_MUTE, 0, 1, 0),
