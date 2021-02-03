@@ -774,6 +774,9 @@ struct  cs42l42_private {
 	struct gpio_desc *reset_gpio;
 	struct completion pdn_done;
 	struct snd_soc_jack jack;
+	struct device_node *fsa_np;
+	struct notifier_block fsa_nb;
+	struct gpio_desc *tip_sense_gpio;
 	int irq;
 	int bclk;
 	u32 sclk;

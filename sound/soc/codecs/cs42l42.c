@@ -25,6 +25,8 @@
 #include <linux/of.h>
 #include <linux/of_gpio.h>
 #include <linux/of_device.h>
+#include <linux/soc/qcom/fsa4480-i2c.h>
+#include <linux/usb/typec.h>
 #include <sound/core.h>
 #include <sound/pcm.h>
 #include <sound/pcm_params.h>
@@ -1831,6 +1833,29 @@ static const struct snd_soc_component_driver soc_component_dev_cs42l42 = {
 	.non_legacy_dai_naming	= 1,
 };
 
+static int cs42l42_usbc_ana_event_handler(struct notifier_block *nb,
+		unsigned long mode, void *ptr)
+{
+        struct cs42l42_private *cs42l42 = container_of(nb,
+					struct cs42l42_private, fsa_nb);
+
+	if (!cs42l42 || !cs42l42->component)
+		return -EINVAL;
+
+	dev_dbg(cs42l42->component->dev, "%s: mode = %lu\n", __func__, mode);
+
+	if (mode == TYPEC_ACCESSORY_AUDIO) {
+		if (cs42l42->tip_sense_gpio)
+			gpiod_set_value_cansleep(cs42l42->tip_sense_gpio, 1);
+	} else if (mode == TYPEC_ACCESSORY_NONE) {
+		if (cs42l42->tip_sense_gpio &&
+				gpiod_get_value(cs42l42->tip_sense_gpio))
+			gpiod_set_value_cansleep(cs42l42->tip_sense_gpio, 0);
+	}
+
+	return 0;
+}
+
 static int cs42l42_i2c_probe(struct i2c_client *i2c_client,
 				       const struct i2c_device_id *id)
 {
@@ -1949,6 +1974,27 @@ static int cs42l42_i2c_probe(struct i2c_client *i2c_client,
 			&soc_component_dev_cs42l42, &cs42l42_dai, 1);
 	if (ret < 0)
 		goto err_disable;
+
+	cs42l42->tip_sense_gpio = devm_gpiod_get_optional(&i2c_client->dev,
+					"tip-sense", GPIOD_OUT_LOW);
+	if (IS_ERR(cs42l42->tip_sense_gpio))
+		dev_err(&i2c_client->dev, "No tip sense GPIO defined\n");
+
+	cs42l42->fsa_np = of_parse_phandle(i2c_client->dev.of_node,
+				"fsa4480-i2c-handle", 0);
+	if (!cs42l42->fsa_np)
+		dev_err(&i2c_client->dev, "fsa4480 i2c node not found\n");
+	else {
+		cs42l42->fsa_nb.notifier_call = cs42l42_usbc_ana_event_handler;
+		cs42l42->fsa_nb.priority = 0;
+		ret = fsa4480_reg_notifier(&cs42l42->fsa_nb, cs42l42->fsa_np);
+
+		if (ret < 0)
+			dev_err(&i2c_client->dev,
+				"registering with fsa4480 failed\n");
+
+	}
+
 	return 0;
 
 err_disable:
@@ -1960,6 +2006,9 @@ err_disable:
 static int cs42l42_i2c_remove(struct i2c_client *i2c_client)
 {
 	struct cs42l42_private *cs42l42 = i2c_get_clientdata(i2c_client);
+
+	if (cs42l42->fsa_np)
+		fsa4480_unreg_notifier(&cs42l42->fsa_nb, cs42l42->fsa_np);
 
 	/* Hold down reset */
 	gpiod_set_value_cansleep(cs42l42->reset_gpio, 0);
