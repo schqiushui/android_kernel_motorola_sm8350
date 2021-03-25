@@ -75,7 +75,7 @@ ifneq ($(strip $(real-obj-y) $(need-builtin)),)
 builtin-target := $(obj)/built-in.a
 endif
 
-ifeq ($(CONFIG_MODULES)$(need-modorder),y1)
+ifdef CONFIG_MODULES
 modorder-target := $(obj)/modules.order
 endif
 
