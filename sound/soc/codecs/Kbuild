@@ -11,12 +11,14 @@ cirrus_cs35l41-objs = cs35l41.o cs35l41-tables.o cs35l41-spi.o
 endif
 obj-m += cirrus_cs35l41.o
 
+ifneq (,$(filter dubai% banks%, $(TARGET_PRODUCT)))
 ifneq ($(filter m y,$(CONFIG_SND_SOC_CS35L45_I2C)),)
 cirrus_cs35l45-objs = cs35l45.o cs35l45-tables.o cs35l45-i2c.o
 else
 cirrus_cs35l45-objs = cs35l45.o cs35l45-tables.o cs35l45-spi.o
 endif
 obj-m += cirrus_cs35l45.o
+endif
 
 KBUILD_EXTRA_SYMBOLS += $(CURDIR)/$(KBUILD_EXTMOD)/../wm_adsp/Module.symvers
 
