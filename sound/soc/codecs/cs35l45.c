@@ -1583,6 +1583,7 @@ static void cs35l45_component_remove(struct snd_soc_component *component)
 }
 
 static const struct snd_soc_component_driver cs35l45_component = {
+	.name = "cs35l45-codec",
 	.probe = cs35l45_component_probe,
 	.remove = cs35l45_component_remove,
 	.set_sysclk = cs35l45_component_set_sysclk,
