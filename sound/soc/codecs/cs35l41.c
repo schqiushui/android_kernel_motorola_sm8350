@@ -3,7 +3,7 @@
 /*
  * cs35l41.c -- CS35l41 ALSA SoC audio driver
  *
- * Copyright 2018 Cirrus Logic, Inc.
+ * Copyright 2017-2020 Cirrus Logic, Inc.
  *
  * Author:	David Rhodes	<david.rhodes@cirrus.com>
  *		Brian Austin	<brian.austin@cirrus.com>
@@ -248,6 +248,9 @@ static int cs35l41_dsp_power_ev(struct snd_soc_dapm_widget *w,
 	return 0;
 }
 
+static int cs35l41_set_csplmboxcmd(struct cs35l41_private *cs35l41,
+				   enum cs35l41_cspl_mboxcmd cmd);
+
 static int cs35l41_dsp_load_ev(struct snd_soc_dapm_widget *w,
 		       struct snd_kcontrol *kcontrol, int event)
 {
@@ -255,6 +258,9 @@ static int cs35l41_dsp_load_ev(struct snd_soc_dapm_widget *w,
 		snd_soc_dapm_to_component(w->dapm);
 	struct cs35l41_private *cs35l41 =
 		snd_soc_component_get_drvdata(component);
+	enum cs35l41_cspl_mboxcmd mboxcmd = CSPL_MBOX_CMD_NONE;
+	enum cs35l41_cspl_mboxstate fw_status = CSPL_MBOX_STS_RUNNING;
+	int ret = 0;
 
 	switch (event) {
 	case SND_SOC_DAPM_POST_PMU:
@@ -262,12 +268,47 @@ static int cs35l41_dsp_load_ev(struct snd_soc_dapm_widget *w,
 			wm_adsp_event(w, kcontrol, event);
 			cs35l41->halo_booted = true;
 		}
+
+		if (cs35l41->dsp.running) {
+			regmap_read(cs35l41->regmap, CS35L41_DSP_MBOX_2,
+				    (unsigned int *)&fw_status);
+			switch (fw_status) {
+			case CSPL_MBOX_STS_RDY_FOR_REINIT:
+				mboxcmd = CSPL_MBOX_CMD_REINIT;
+				break;
+			case CSPL_MBOX_STS_PAUSED:
+				mboxcmd = CSPL_MBOX_CMD_RESUME;
+				break;
+			case CSPL_MBOX_STS_RUNNING:
+				/*
+				 * First time playing audio
+				 * means fw_status is running
+				 */
+				mboxcmd = CSPL_MBOX_CMD_RESUME;
+				break;
+			default:
+				dev_err(cs35l41->dev,
+					"Firmware status is invalid(%u)\n",
+					fw_status);
+				break;
+			}
+			ret = cs35l41_set_csplmboxcmd(cs35l41, mboxcmd);
+		}
+		break;
+	case SND_SOC_DAPM_PRE_PMD:
+		/*
+		 * Workaround for PB 5.41.6 FW power consumption issue.
+		 * FW sets bit FILT_GLOBAL_OVR, so it should be cleared
+		 * after FW boot up
+		 */
+		regmap_update_bits(cs35l41->regmap, CS35L41_CTRL_OVRRIDE,
+				CS35L41_FILT_GLOBAL_OVR_MASK, 0);
 		break;
 	default:
 		break;
 	}
 
-	return 0;
+	return ret;
 }
 
 static int cs35l41_halo_booted_get(struct snd_kcontrol *kcontrol,
@@ -340,6 +381,104 @@ static int cs35l41_force_int_put(struct snd_kcontrol *kcontrol,
 
 	mutex_unlock(&cs35l41->force_int_lock);
 
+	return 0;
+}
+
+static int cs35l41_amp_reset_get(struct snd_kcontrol *kcontrol,
+				     struct snd_ctl_elem_value *ucontrol)
+{
+	return 0;
+}
+
+static int cs35l41_amp_reset_put(struct snd_kcontrol *kcontrol,
+			   struct snd_ctl_elem_value *ucontrol)
+{
+	struct snd_soc_component *component =
+		snd_soc_kcontrol_component(kcontrol);
+	struct cs35l41_private *cs35l41 =
+		snd_soc_component_get_drvdata(component);
+	struct snd_soc_dapm_context *dapm =
+		snd_soc_component_get_dapm(component);
+	int ret, retries, timeout = 100;
+	u32 status;
+
+	if (!ucontrol->value.integer.value[0])
+		return 0;
+
+	dev_info(cs35l41->dev, "AMP reset requested\n");
+
+	if (!cs35l41->reset_gpio) {
+		dev_info(cs35l41->dev, "Reset GPIO is not configured\n");
+		return 0;
+	}
+
+	disable_irq(cs35l41->irq);
+	cs35l41->halo_booted = false;
+
+	/* invalidate all cached values which have now been reset */
+	regcache_cache_only(cs35l41->regmap, true);
+	regcache_mark_dirty(cs35l41->regmap);
+
+	/* Toggle reset pin */
+	gpiod_set_value_cansleep(cs35l41->reset_gpio, 0);
+	/* satisfy minimum reset pulse width spec */
+	usleep_range(2000, 2100);
+	gpiod_set_value_cansleep(cs35l41->reset_gpio, 1);
+	usleep_range(2000, 2100);
+
+	regcache_cache_only(cs35l41->regmap, false);
+
+	do {
+		if (timeout == 0) {
+			dev_err(cs35l41->dev,
+				"Timeout waiting for OTP_BOOT_DONE\n");
+			return -EBUSY;
+		}
+		usleep_range(1000, 1100);
+		regmap_read(cs35l41->regmap, CS35L41_IRQ1_STATUS4, &status);
+		timeout--;
+	} while (!(status & CS35L41_OTP_BOOT_DONE));
+
+	/* Sync regmap */
+	regcache_sync(cs35l41->regmap);
+
+	/* Reset DSP */
+	regmap_update_bits(cs35l41->regmap, CS35L41_DSP_CLK_CTRL,
+			0x3, 0x2);
+	regmap_update_bits(cs35l41->regmap,
+			CS35L41_DSP1_CCM_CORE_CTRL,
+			CS35L41_HALO_CORE_RESET, CS35L41_HALO_CORE_RESET);
+	regmap_update_bits(cs35l41->regmap, CS35L41_DSP_CLK_CTRL,
+			0x3, 0x3);
+
+	/* Restore OTP and cached values */
+	retries = 5;
+	do {
+		dev_info(cs35l41->dev, "cs35l41_restore attempt %d\n",
+		 6 - retries);
+		ret = cs35l41_restore(cs35l41);
+		usleep_range(4000, 5000);
+	} while (ret < 0 && --retries > 0);
+
+	enable_irq(cs35l41->irq);
+
+	if (retries < 0) {
+		dev_err(cs35l41->dev, "Failed to reset AMP\n");
+		return 0;
+	}
+
+	dev_dbg(cs35l41->dev, "cs35l41 restored in %d attempts\n",
+			6 - retries);
+
+	if (cs35l41->dsp.preloaded) {
+		dev_info(cs35l41->dev, "Reload DSP\n");
+		snd_soc_component_disable_pin(component, "DSP1 Preload");
+		snd_soc_dapm_sync(dapm);
+		usleep_range(4000, 5000);
+		snd_soc_component_force_enable_pin(component, "DSP1 Preload");
+		snd_soc_dapm_sync(dapm);
+		flush_work(&cs35l41->dsp.boot_work);
+	}
 	return 0;
 }
 
@@ -571,7 +710,7 @@ static int cs35l41_do_fast_switch(struct cs35l41_private *cs35l41)
 			break;
 		}
 
-		usleep_range(100, 110);
+		usleep_range(100, 200);
 	}
 
 	if (!fw_running) {
@@ -732,7 +871,7 @@ static int cs35l41_set_csplmboxcmd(struct cs35l41_private *cs35l41,
 
 	/* Poll for DSP ACK */
 	for (i = 0; i < 5; i++) {
-		usleep_range(1000, 1010);
+		usleep_range(1000, 1100);
 		ret = regmap_read(cs35l41->regmap, CS35L41_IRQ1_STATUS2, &sts);
 		if (ret < 0) {
 			dev_err(cs35l41->dev, "regmap_read failed (%d)\n", ret);
@@ -1378,6 +1517,8 @@ static const struct snd_kcontrol_new cs35l41_aud_controls[] = {
 	SOC_ENUM("PCM Soft Ramp", pcm_sft_ramp),
 	SOC_SINGLE_EXT("DSP Booted", SND_SOC_NOPM, 0, 1, 0,
 			cs35l41_halo_booted_get, cs35l41_halo_booted_put),
+	SOC_SINGLE_EXT("AMP Reset", SND_SOC_NOPM, 0, 1, 0,
+			cs35l41_amp_reset_get, cs35l41_amp_reset_put),
 	SOC_SINGLE_EXT("CCM Reset", CS35L41_DSP1_CCM_CORE_CTRL, 0, 1, 0,
 			cs35l41_ccm_reset_get, cs35l41_ccm_reset_put),
 	SOC_SINGLE_EXT("Force Interrupt", SND_SOC_NOPM, 0, 1, 0,
@@ -1792,7 +1933,6 @@ static int cs35l41_main_amp_event(struct snd_soc_dapm_widget *w,
 		snd_soc_component_get_drvdata(component);
 	enum cs35l41_cspl_mboxcmd mboxcmd = CSPL_MBOX_CMD_NONE;
 	int ret = 0;
-	enum cs35l41_cspl_mboxstate fw_status = CSPL_MBOX_STS_RUNNING;
 	int i;
 	bool pdn;
 	unsigned int val;
@@ -1808,32 +1948,6 @@ static int cs35l41_main_amp_event(struct snd_soc_dapm_widget *w,
 				1 << CS35L41_GLOBAL_EN_SHIFT);
 
 		usleep_range(1000, 1100);
-
-		if (cs35l41->dsp.running) {
-			regmap_read(cs35l41->regmap, CS35L41_DSP_MBOX_2,
-				    (unsigned int *)&fw_status);
-			switch (fw_status) {
-			case CSPL_MBOX_STS_RDY_FOR_REINIT:
-				mboxcmd = CSPL_MBOX_CMD_REINIT;
-				break;
-			case CSPL_MBOX_STS_PAUSED:
-				mboxcmd = CSPL_MBOX_CMD_RESUME;
-				break;
-			case CSPL_MBOX_STS_RUNNING:
-				/*
-				 * First time playing audio
-				 * means fw_status is running
-				 */
-				mboxcmd = CSPL_MBOX_CMD_RESUME;
-				break;
-			default:
-				dev_err(cs35l41->dev,
-					"Firmware status is invalid(%u)\n",
-					fw_status);
-				break;
-			}
-			ret = cs35l41_set_csplmboxcmd(cs35l41, mboxcmd);
-		}
 
 		atomic_set(&cs35l41->vol_ctl.playback, 1);
 		if (atomic_read(&cs35l41->vol_ctl.manual_ramp) ||
@@ -1871,7 +1985,7 @@ static int cs35l41_main_amp_event(struct snd_soc_dapm_widget *w,
 					pdn = true;
 					break;
 				}
-				usleep_range(1000, 1010);
+				usleep_range(1000, 1100);
 			}
 
 			if (!pdn)
@@ -2078,12 +2192,10 @@ static int cs35l41_set_dai_fmt(struct snd_soc_dai *codec_dai, unsigned int fmt)
 	case SND_SOC_DAIFMT_DSP_A:
 		asp_fmt = 0;
 		cs35l41->i2s_mode = false;
-		cs35l41->dspa_mode = true;
 		break;
 	case SND_SOC_DAIFMT_I2S:
 		asp_fmt = 2;
 		cs35l41->i2s_mode = true;
-		cs35l41->dspa_mode = false;
 		break;
 	default:
 		dev_warn(cs35l41->dev,
@@ -2182,6 +2294,12 @@ static int cs35l41_pcm_hw_params(struct snd_pcm_substream *substream,
 			break;
 	}
 
+	if (i >= ARRAY_SIZE(cs35l41_fs_rates)) {
+		dev_err(cs35l41->dev, "%s: Unsupported rate: %u\n",
+						__func__, rate);
+		return -EINVAL;
+	}
+
 	asp_wl = params_width(params);
 	asp_width = params_physical_width(params);
 
@@ -2195,7 +2313,8 @@ static int cs35l41_pcm_hw_params(struct snd_pcm_substream *substream,
 	if (cs35l41->amp_hibernate == CS35L41_HIBERNATE_STANDBY)
 		return 0;
 
-	regmap_update_bits(cs35l41->regmap, CS35L41_GLOBAL_CLK_CTRL,
+	if (i < ARRAY_SIZE(cs35l41_fs_rates))
+		regmap_update_bits(cs35l41->regmap, CS35L41_GLOBAL_CLK_CTRL,
 			CS35L41_GLOBAL_FS_MASK,
 			cs35l41_fs_rates[i].fs_cfg << CS35L41_GLOBAL_FS_SHIFT);
 
@@ -2520,40 +2639,61 @@ static int cs35l41_set_pdata(struct cs35l41_private *cs35l41)
 				cs35l41->pdata.invert_pcm <<
 				CS35L41_AMP_INV_PCM_SHIFT);
 
-	if (cs35l41->pdata.ng_enable) {
+	if (cs35l41->pdata.dsp_ng_enable) {
 		regmap_update_bits(cs35l41->regmap,
 				CS35L41_MIXER_NGATE_CH1_CFG,
-				CS35L41_NG_ENABLE_MASK,
-				CS35L41_NG_ENABLE_MASK);
+				CS35L41_DSP_NG_ENABLE_MASK,
+				CS35L41_DSP_NG_ENABLE_MASK);
 		regmap_update_bits(cs35l41->regmap,
 				CS35L41_MIXER_NGATE_CH2_CFG,
-				CS35L41_NG_ENABLE_MASK,
-				CS35L41_NG_ENABLE_MASK);
+				CS35L41_DSP_NG_ENABLE_MASK,
+				CS35L41_DSP_NG_ENABLE_MASK);
 
-		if (cs35l41->pdata.ng_pcm_thld) {
+		if (cs35l41->pdata.dsp_ng_pcm_thld) {
 			regmap_update_bits(cs35l41->regmap,
 				CS35L41_MIXER_NGATE_CH1_CFG,
-				CS35L41_NG_THLD_MASK,
-				cs35l41->pdata.ng_pcm_thld);
+				CS35L41_DSP_NG_THLD_MASK,
+				cs35l41->pdata.dsp_ng_pcm_thld);
 			regmap_update_bits(cs35l41->regmap,
 				CS35L41_MIXER_NGATE_CH2_CFG,
-				CS35L41_NG_THLD_MASK,
-				cs35l41->pdata.ng_pcm_thld);
+				CS35L41_DSP_NG_THLD_MASK,
+				cs35l41->pdata.dsp_ng_pcm_thld);
 		}
 
-		if (cs35l41->pdata.ng_delay) {
+		if (cs35l41->pdata.dsp_ng_delay) {
 			regmap_update_bits(cs35l41->regmap,
 				CS35L41_MIXER_NGATE_CH1_CFG,
-				CS35L41_NG_DELAY_MASK,
-				cs35l41->pdata.ng_delay <<
-				CS35L41_NG_DELAY_SHIFT);
+				CS35L41_DSP_NG_DELAY_MASK,
+				cs35l41->pdata.dsp_ng_delay <<
+				CS35L41_DSP_NG_DELAY_SHIFT);
 			regmap_update_bits(cs35l41->regmap,
 				CS35L41_MIXER_NGATE_CH2_CFG,
-				CS35L41_NG_DELAY_MASK,
-				cs35l41->pdata.ng_delay <<
-				CS35L41_NG_DELAY_SHIFT);
+				CS35L41_DSP_NG_DELAY_MASK,
+				cs35l41->pdata.dsp_ng_delay <<
+				CS35L41_DSP_NG_DELAY_SHIFT);
 		}
 	}
+
+	if (cs35l41->pdata.hw_ng_sel)
+		regmap_update_bits(cs35l41->regmap,
+				CS35L41_NG_CFG,
+				CS35L41_HW_NG_SEL_MASK,
+				cs35l41->pdata.hw_ng_sel <<
+				CS35L41_HW_NG_SEL_SHIFT);
+
+	if (cs35l41->pdata.hw_ng_thld)
+		regmap_update_bits(cs35l41->regmap,
+				CS35L41_NG_CFG,
+				CS35L41_HW_NG_THLD_MASK,
+				cs35l41->pdata.hw_ng_thld <<
+				CS35L41_HW_NG_THLD_SHIFT);
+
+	if (cs35l41->pdata.hw_ng_delay)
+		regmap_update_bits(cs35l41->regmap,
+				CS35L41_NG_CFG,
+				CS35L41_HW_NG_DLY_MASK,
+				cs35l41->pdata.hw_ng_delay <<
+				CS35L41_HW_NG_DLY_SHIFT);
 
 	if (classh->classh_algo_enable) {
 		if (classh->classh_bst_override)
@@ -2613,31 +2753,32 @@ static int cs35l41_component_probe(struct snd_soc_component *component)
 
 	cs35l41_set_pdata(cs35l41);
 
-	/* These should only run once, not every hibernate cycle */
-	if (!(cs35l41->skip_codec_probe)) {
-		wm_adsp2_component_probe(&cs35l41->dsp, component);
-		cs35l41->skip_codec_probe = true;
+	wm_adsp2_component_probe(&cs35l41->dsp, component);
 
-		/* Add run-time mixer control for fast use case switch */
-		kcontrol = kzalloc(sizeof(*kcontrol), GFP_KERNEL);
-		if (!kcontrol) {
-			ret = -ENOMEM;
-			goto exit;
-		}
-
-		kcontrol->name = "Fast Use Case Delta File";
-		kcontrol->iface = SNDRV_CTL_ELEM_IFACE_MIXER;
-		kcontrol->info = snd_soc_info_enum_double;
-		kcontrol->get = cs35l41_fast_switch_file_get;
-		kcontrol->put = cs35l41_fast_switch_file_put;
-		kcontrol->private_value =
-				  (unsigned long)&cs35l41->fast_switch_enum;
-		ret = snd_soc_add_component_controls(component, kcontrol, 1);
-		if (ret < 0)
-			dev_err(cs35l41->dev,
-			       "snd_soc_add_codec_controls failed (%d)\n", ret);
-		kfree(kcontrol);
+	/* Add run-time mixer control for fast use case switch */
+	kcontrol = kzalloc(sizeof(*kcontrol), GFP_KERNEL);
+	if (!kcontrol) {
+		ret = -ENOMEM;
+		goto exit;
 	}
+
+	kcontrol->name = "Fast Use Case Delta File";
+	kcontrol->iface = SNDRV_CTL_ELEM_IFACE_MIXER;
+	kcontrol->info = snd_soc_info_enum_double;
+	kcontrol->get = cs35l41_fast_switch_file_get;
+	kcontrol->put = cs35l41_fast_switch_file_put;
+	kcontrol->private_value =
+			  (unsigned long)&cs35l41->fast_switch_enum;
+	ret = snd_soc_add_component_controls(component, kcontrol, 1);
+	if (ret < 0)
+		dev_err(cs35l41->dev,
+		       "snd_soc_add_codec_controls failed (%d)\n", ret);
+	kfree(kcontrol);
+
+	/* Move to the extended standby state */
+	regmap_multi_reg_write_bypassed(cs35l41->regmap,
+				cs35l41_pdn_patch,
+				ARRAY_SIZE(cs35l41_pdn_patch));
 exit:
 	return ret;
 }
@@ -2854,12 +2995,21 @@ static int cs35l41_handle_of_data(struct device *dev,
 	else
 		pdata->dout_hiz = -1;
 
-	pdata->ng_enable = of_property_read_bool(np,
-					"cirrus,noise-gate-enable");
-	if (of_property_read_u32(np, "cirrus,noise-gate-threshold", &val) >= 0)
-		pdata->ng_pcm_thld = val | CS35L41_VALID_PDATA;
-	if (of_property_read_u32(np, "cirrus,noise-gate-delay", &val) >= 0)
-		pdata->ng_delay = val | CS35L41_VALID_PDATA;
+	pdata->dsp_ng_enable = of_property_read_bool(np,
+					"cirrus,dsp-noise-gate-enable");
+	if (of_property_read_u32(np,
+				"cirrus,dsp-noise-gate-threshold", &val) >= 0)
+		pdata->dsp_ng_pcm_thld = val | CS35L41_VALID_PDATA;
+	if (of_property_read_u32(np, "cirrus,dsp-noise-gate-delay", &val) >= 0)
+		pdata->dsp_ng_delay = val | CS35L41_VALID_PDATA;
+
+	if (of_property_read_u32(np, "cirrus,hw-noise-gate-select", &val) >= 0)
+		pdata->hw_ng_sel = val | CS35L41_VALID_PDATA;
+	if (of_property_read_u32(np,
+				"cirrus,hw-noise-gate-threshold", &val) >= 0)
+		pdata->hw_ng_thld = val | CS35L41_VALID_PDATA;
+	if (of_property_read_u32(np, "cirrus,hw-noise-gate-delay", &val) >= 0)
+		pdata->hw_ng_delay = val | CS35L41_VALID_PDATA;
 
 	sub_node = of_get_child_by_name(np, "cirrus,classh-internal-algo");
 	classh_config->classh_algo_enable = sub_node ? true : false;
@@ -2998,10 +3148,29 @@ static const struct reg_sequence cs35l41_revb2_errata_patch[] = {
 	{0x00000040,			0x00003333},
 };
 
+static const struct reg_sequence cs35l41_fs_errata_patch[] = {
+	{0x02B80080,			0x00000001},
+	{0x02B80088,			0x00000001},
+	{0x02B80090,			0x00000001},
+	{0x02B80098,			0x00000001},
+	{0x02B800A0,			0x00000001},
+	{0x02B800A8,			0x00000001},
+	{0x02B800B0,			0x00000001},
+	{0x02B800B8,			0x00000001},
+	{0x02B80280,			0x00000001},
+	{0x02B80288,			0x00000001},
+	{0x02B80290,			0x00000001},
+	{0x02B80298,			0x00000001},
+	{0x02B802A0,			0x00000001},
+	{0x02B802A8,			0x00000001},
+	{0x02B802B0,			0x00000001},
+	{0x02B802B8,			0x00000001},
+};
+
 static int cs35l41_dsp_init(struct cs35l41_private *cs35l41)
 {
 	struct wm_adsp *dsp;
-	int ret, i;
+	int ret;
 
 	dsp = &cs35l41->dsp;
 	dsp->num = 1;
@@ -3016,27 +3185,50 @@ static int cs35l41_dsp_init(struct cs35l41_private *cs35l41)
 	dsp->num_mems = ARRAY_SIZE(cs35l41_dsp1_regions);
 	dsp->lock_regions = 0xFFFFFFFF;
 
-	dsp->n_rx_channels = CS35L41_DSP_N_RX_RATES;
-	dsp->n_tx_channels = CS35L41_DSP_N_TX_RATES;
+	regmap_multi_reg_write(cs35l41->regmap,
+			cs35l41_fs_errata_patch,
+			ARRAY_SIZE(cs35l41_fs_errata_patch));
 
 	mutex_init(&cs35l41->rate_lock);
 	ret = wm_halo_init(dsp, &cs35l41->rate_lock);
+	if (ret != 0) {
+		dev_err(cs35l41->dev, "wm_halo_init failed\n");
+		goto err;
+	}
+
 	cs35l41->halo_booted = false;
 
-	for (i = 0; i < CS35L41_DSP_N_RX_RATES; i++)
-		dsp->rx_rate_cache[i] = 0x1;
-	for (i = 0; i < CS35L41_DSP_N_TX_RATES; i++)
-		dsp->tx_rate_cache[i] = 0x1;
-
-	regmap_write(cs35l41->regmap, CS35L41_DSP1_RX5_SRC,
+	ret = regmap_write(cs35l41->regmap, CS35L41_DSP1_RX5_SRC,
 					CS35L41_INPUT_SRC_VPMON);
-	regmap_write(cs35l41->regmap, CS35L41_DSP1_RX6_SRC,
+	if (ret < 0) {
+		dev_err(cs35l41->dev, "Write INPUT_SRC_VPMON failed\n");
+		goto err_dsp;
+	}
+	ret = regmap_write(cs35l41->regmap, CS35L41_DSP1_RX6_SRC,
 					CS35L41_INPUT_SRC_CLASSH);
-	regmap_write(cs35l41->regmap, CS35L41_DSP1_RX7_SRC,
+	if (ret < 0) {
+		dev_err(cs35l41->dev, "Write INPUT_SRC_CLASSH failed\n");
+		goto err_dsp;
+	}
+	ret = regmap_write(cs35l41->regmap, CS35L41_DSP1_RX7_SRC,
 					CS35L41_INPUT_SRC_TEMPMON);
-	regmap_write(cs35l41->regmap, CS35L41_DSP1_RX8_SRC,
+	if (ret < 0) {
+		dev_err(cs35l41->dev, "Write INPUT_SRC_TEMPMON failed\n");
+		goto err_dsp;
+	}
+	ret = regmap_write(cs35l41->regmap, CS35L41_DSP1_RX8_SRC,
 					CS35L41_INPUT_SRC_RSVD);
+	if (ret < 0) {
+		dev_err(cs35l41->dev, "Write INPUT_SRC_RSVD failed\n");
+		goto err_dsp;
+	}
 
+	return 0;
+
+err_dsp:
+	wm_adsp2_remove(dsp);
+err:
+	mutex_destroy(&cs35l41->rate_lock);
 	return ret;
 }
 
@@ -3120,7 +3312,7 @@ static int cs35l41_exit_hibernate(struct cs35l41_private *cs35l41)
 				dev_dbg(cs35l41->dev,
 					"%s: wakeup write fail\n", __func__);
 
-			usleep_range(100, 110);
+			usleep_range(100, 200);
 
 			ret = regmap_read(cs35l41->regmap,
 					  CS35L41_CSPL_MBOX_STS, &status);
@@ -3412,11 +3604,17 @@ int cs35l41_probe(struct cs35l41_private *cs35l41,
 	} else if (cs35l41->dev->of_node) {
 		ret = cs35l41_handle_of_data(cs35l41->dev, &cs35l41->pdata,
 					     cs35l41);
-		if (ret != 0)
-			return ret;
+		if (ret != 0) {
+			ret = -ENODEV;
+			goto err;
+		}
 	} else {
-		ret = -EINVAL;
+#ifdef CONFIG_ACPI
+
+#else
+		ret = -ENODEV;
 		goto err;
+#endif
 	}
 
 	ret = regulator_bulk_enable(cs35l41->num_supplies, cs35l41->supplies);
@@ -3519,6 +3717,7 @@ int cs35l41_probe(struct cs35l41_private *cs35l41,
 	/* CS35L41 needs INT for PDN_DONE */
 	if (ret != 0) {
 		dev_err(cs35l41->dev, "Failed to request IRQ: %d\n", ret);
+		ret = -ENODEV;
 		goto err;
 	}
 
@@ -3598,7 +3797,7 @@ int cs35l41_probe(struct cs35l41_private *cs35l41,
 	ret = cs35l41_otp_unpack(cs35l41);
 	if (ret < 0) {
 		dev_err(cs35l41->dev, "OTP Unpack failed\n");
-		goto err;
+		goto err_otp;
 	}
 
 	/* read all trim regs */
@@ -3611,16 +3810,25 @@ int cs35l41_probe(struct cs35l41_private *cs35l41,
 		p_trim_data += cs35l41_trim_cache_regs[i].size;
 	}
 
-	regmap_write(cs35l41->regmap,
-			CS35L41_DSP1_CCM_CORE_CTRL, 0);
-	cs35l41_dsp_init(cs35l41);
+	ret = regmap_write(cs35l41->regmap, CS35L41_DSP1_CCM_CORE_CTRL, 0);
+	if (ret < 0) {
+		dev_err(cs35l41->dev, "Write CCM_CORE_CTRL failed\n");
+		goto err_otp;
+	}
+
+	ret = cs35l41_dsp_init(cs35l41);
+	if (ret < 0) {
+		dev_err(cs35l41->dev, "%s: dsp_init failed\n",
+			__func__);
+		goto err_otp;
+	}
 
 	ret = snd_soc_register_component(cs35l41->dev,
 					&soc_component_dev_cs35l41,
 					cs35l41_dai, ARRAY_SIZE(cs35l41_dai));
 	if (ret < 0) {
 		dev_err(cs35l41->dev, "%s: Register codec failed\n", __func__);
-		goto err;
+		goto err_dsp;
 	}
 
 	dev_info(cs35l41->dev, "Cirrus Logic CS35L41 (%x), Revision: %02X\n",
@@ -3629,11 +3837,20 @@ int cs35l41_probe(struct cs35l41_private *cs35l41,
 	cs35l41->wq = create_singlethread_workqueue("cs35l41");
 	if (cs35l41->wq == NULL) {
 		ret = -ENOMEM;
-		goto err;
+		goto err_codec;
 	}
 
 	INIT_DELAYED_WORK(&cs35l41->hb_work, cs35l41_hibernate_work);
 	mutex_init(&cs35l41->hb_lock);
+	return 0;
+err_codec:
+	snd_soc_unregister_component(cs35l41->dev);
+err_dsp:
+	wm_adsp2_remove(&cs35l41->dsp);
+err_otp:
+	destroy_workqueue(cs35l41->vol_ctl.ramp_wq);
+	mutex_destroy(&cs35l41->force_int_lock);
+	mutex_destroy(&cs35l41->vol_ctl.vol_mutex);
 err:
 	regulator_bulk_disable(cs35l41->num_supplies, cs35l41->supplies);
 	return ret;

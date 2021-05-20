@@ -3,7 +3,7 @@
 /*
  * linux/sound/cs35l41.h -- Platform data for CS35L41
  *
- * Copyright (c) 2018 Cirrus Logic Inc.
+ * Copyright (c) 2017-2020 Cirrus Logic Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -36,7 +36,7 @@ struct cs35l41_platform_data {
 	bool lrclk_frc;
 	bool right_channel;
 	bool amp_gain_zc;
-	bool ng_enable;
+	bool dsp_ng_enable;
 	bool invert_pcm;
 	bool hibernate_enable;
 	bool fwname_use_revid;
@@ -45,8 +45,11 @@ struct cs35l41_platform_data {
 	int bst_ipk;
 	int bst_cap;
 	int temp_warn_thld;
-	int ng_pcm_thld;
-	int ng_delay;
+	int dsp_ng_pcm_thld;
+	int dsp_ng_delay;
+	unsigned int hw_ng_sel;
+	unsigned int hw_ng_delay;
+	unsigned int hw_ng_thld;
 	int dout_hiz;
 	struct cs35l41_irq_cfg irq_config1;
 	struct cs35l41_irq_cfg irq_config2;
@@ -100,11 +103,9 @@ struct cs35l41_private {
 	int sclk_fmt;
 	int amp_hibernate;
 	bool reload_tuning;
-	bool dspa_mode;
 	bool i2s_mode;
 	bool swire_mode;
 	bool halo_booted;
-	bool skip_codec_probe;
 	bool bus_spi;
 	bool fast_switch_en;
 	bool force_int;

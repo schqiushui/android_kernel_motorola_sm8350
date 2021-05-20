@@ -3,7 +3,7 @@
 /*
  * cs35l41-i2c.c -- CS35l41 I2C driver
  *
- * Copyright 2017 Cirrus Logic, Inc.
+ * Copyright 2017-2020 Cirrus Logic, Inc.
  *
  * Author:	David Rhodes	<david.rhodes@cirrus.com>
  *
@@ -29,6 +29,7 @@
 #include <linux/of_gpio.h>
 #include <linux/regmap.h>
 #include <linux/gpio.h>
+#include <linux/acpi.h>
 
 #include "wm_adsp.h"
 #include "cs35l41.h"
@@ -83,8 +84,12 @@ static int cs35l41_i2c_probe(struct i2c_client *client,
 			ret);
 		return ret;
 	}
-
-	return cs35l41_probe(cs35l41, pdata);
+	ret = cs35l41_probe(cs35l41, pdata);
+	if ((ret != 0 ) && (ret != -ENODEV) && (ret != -ENOMEM)) {
+		dev_err(dev, "I2C bus IO error. Try to defer probe\n");
+		ret = -EPROBE_DEFER;
+	}
+	return ret;
 }
 
 static int cs35l41_i2c_remove(struct i2c_client *client)
@@ -94,17 +99,28 @@ static int cs35l41_i2c_remove(struct i2c_client *client)
 	return cs35l41_remove(cs35l41);
 }
 
+#ifdef CONFIG_OF
 static const struct of_device_id cs35l41_of_match[] = {
 	{.compatible = "cirrus,cs35l40"},
 	{.compatible = "cirrus,cs35l41"},
 	{},
 };
 MODULE_DEVICE_TABLE(of, cs35l41_of_match);
+#endif
+
+#ifdef CONFIG_ACPI
+static const struct acpi_device_id cs35l41_acpi_match[] = {
+	{ "CLSA3541", 0 },
+	{},
+};
+MODULE_DEVICE_TABLE(acpi, cs35l41_acpi_match);
+#endif
 
 static struct i2c_driver cs35l41_i2c_driver = {
 	.driver = {
 		.name		= "cs35l41",
-		.of_match_table = cs35l41_of_match,
+		.of_match_table = of_match_ptr(cs35l41_of_match),
+		.acpi_match_table = ACPI_PTR(cs35l41_acpi_match),
 	},
 	.id_table	= cs35l41_id_i2c,
 	.probe		= cs35l41_i2c_probe,
