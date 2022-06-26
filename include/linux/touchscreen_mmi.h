@@ -95,6 +95,10 @@
 	((event == DRM_PANEL_EVENT_UNBLANK) && \
 	 (!evdata.early_trigger))
 
+#define EVENT_DISPLAY_LP \
+	((event == DRM_PANEL_BLANK_LP) && \
+	 (!evdata.early_trigger))
+
 #else /* CONFIG_DRM_PANEL_EVENT_NOTIFICATIONS */
 #if defined(CONFIG_DRM_PANEL_NOTIFICATIONS)
 #include <drm/drm_panel.h>
@@ -136,6 +140,9 @@ struct drm_panel_notifier *evdata = evd; \
 #define EVENT_DISPLAY_ON \
 	((event == DRM_PANEL_EVENT_BLANK) && \
 	 (*blank == DRM_PANEL_BLANK_UNBLANK))
+
+#define EVENT_DISPLAY_LP \
+	(*blank == DRM_PANEL_BLANK_LP)
 
 #else /* CONFIG_DRM_PANEL_NOTIFICATIONS */
 #if LINUX_VERSION_CODE <= KERNEL_VERSION(4,14,0)
