@@ -1,8 +1,9 @@
 # add -Wall to try to catch everything we can.
 EXTRA_CFLAGS += -Wall
-EXTRA_CFLAGS += \
-	-I$(ANDROID_BUILD_TOP)/vendor/cirrus/audio/dlkm/include \
-	-I$(ANDROID_BUILD_TOP)/vendor/cirrus/audio/dlkm/sound/soc/wm_adsp
+
+LINUXINCLUDE += \
+	-I$(srctree)/techpack/cirrus/include \
+	-I$(srctree)/techpack/cirrus/sound/soc/wm_adsp
 
 ifneq ($(filter m y,$(CONFIG_SND_SOC_CS35L41_I2C)),)
 cirrus_cs35l41-objs = cs35l41.o cs35l41-tables.o cs35l41-i2c.o
