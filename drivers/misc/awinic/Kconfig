@@ -1,0 +1,17 @@
+# SPDX-License-Identifier: GPL-2.0-only
+#
+# Misc strange devices
+#
+
+menu "Awinic drivers"
+
+source "drivers/misc/awinic/aw862x/Kconfig"
+source "drivers/misc/awinic/aw862x_haptic_nv/Kconfig"
+source "drivers/misc/awinic/aw869x/Kconfig"
+source "drivers/misc/awinic/aw869xx/Kconfig"
+source "drivers/misc/awinic/aw8624/Kconfig"
+source "drivers/misc/awinic/aw8695/Kconfig"
+source "drivers/misc/awinic/aw8697/Kconfig"
+source "drivers/misc/awinic/haptic_hv/Kconfig"
+
+endmenu
