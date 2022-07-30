@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # SPDX-License-Identifier: GPL-2.0
 #
 # Makefile for misc devices that really don't fit anywhere else.
@@ -66,15 +65,7 @@ qseecom-mod-$(CONFIG_COMPAT)	+= compat_qseecom.o
 obj-$(CONFIG_PROFILER)			+= profiler.o
 obj-$(CONFIG_WIGIG_SENSING_SPI)	+= wigig_sensing.o
 obj-$(CONFIG_HISI_HIKEY_USB)	+= hisi_hikey_usb.o
-=======
-KERNEL_SRC ?= /lib/modules/$(shell uname -r)/build
-
-all:
-	$(MAKE) -C $(KERNEL_SRC) M=$(shell pwd) modules $(KBUILD_OPTIONS)
-
-modules_install:
-	$(MAKE) INSTALL_MOD_STRIP=1 -C $(KERNEL_SRC) M=$(shell pwd) modules_install
-
-clean:
-	$(MAKE) -C $(KERNEL_SRC) M=$(PWD) clean
->>>>>>> 12ae06669346dab8e50c9ec2bee84113cc57014b
+obj-$(CONFIG_SARSENSOR_SX937X)	+= sx937x/
+obj-y				+= awinic/aw862x/
+obj-$(CONFIG_MOTO_UTAGS) 	+= utag/
+obj-$(CONFIG_MMI_SYS_TEMP) 	+= mmi_sys_temp/
