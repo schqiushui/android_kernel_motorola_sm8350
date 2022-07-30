@@ -1,5 +1,16 @@
+#
+# Qcom AW8697_HAPTIC Driver
+#
+
 config AW8697_HAPTIC
-    tristate "Haptic driver for awinic aw8697 series"
-    depends on I2C
-    help
-      This option enables support for aw8697 series Haptic Driver.
+	tristate "AW8697_HAPTIC driver"
+	depends on I2C
+	help
+	  Say Y here if you have Awinic AW8697 haptic controller
+	  chip in your system.
+	  If unsure, say N.
+	  To compile this driver as a module, choose M here: the
+	  module will be called awinic_haptic_hv.
+
+
+

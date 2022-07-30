@@ -2,6 +2,6 @@
 EXTRA_CFLAGS += -Wall
 EXTRA_CFLAGS += -I$(ANDROID_BUILD_TOP)/motorola/kernel/modules/include
 
-obj-m += st21nfc.o
+obj-$(CONFIG_NFC_ST21NFC) += st21nfc.o
 
 KBUILD_EXTRA_SYMBOLS += $(CURDIR)/$(KBUILD_EXTMOD)/../../mmi_info/Module.symvers

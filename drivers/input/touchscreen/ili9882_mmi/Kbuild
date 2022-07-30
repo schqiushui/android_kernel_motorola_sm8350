@@ -9,59 +9,59 @@ ifeq ($(filter m y, $(CONFIG_TOUCHSCREEN_ILITEK_CHIPSET)),)
 endif
 
 ifneq ($(filter m y,$(CONFIG_INPUT_ILI_0FLASH_MMI_ENABLE_DOUBLE_TAP)),)
-	EXTRA_CFLAGS += -DILI_SENSOR_EN
+	ccflags-y += -DILI_SENSOR_EN
 	KBUILD_EXTRA_SYMBOLS += $(CURDIR)/$(KBUILD_EXTMOD)/../../../sensors/$(GKI_OBJ_MODULE_DIR)/Module.symvers
 endif
 
 ifneq ($(filter m y,$(CONFIG_INPUT_ILI_0FLASH_MMI_NOTIFY_TOUCH_STATE)),)
-	EXTRA_CFLAGS += -DILI_SET_TOUCH_STATE
+	ccflags-y += -DILI_SET_TOUCH_STATE
 endif
 
 ifneq ($(filter m y, $(CONFIG_BOARD_USES_DOUBLE_TAP_CTRL)),)
-	EXTRA_CFLAGS += -DCONFIG_BOARD_USES_DOUBLE_TAP_CTRL
+	ccflags-y += -DCONFIG_BOARD_USES_DOUBLE_TAP_CTRL
 endif
 
 ifneq ($(filter m y,$(CONFIG_INPUT_ILI_PANEL_NOTIFICATIONS)),)
-EXTRA_CFLAGS += -DILI_CONFIG_PANEL_NOTIFICATIONS
+	ccflags-y += -DILI_CONFIG_PANEL_NOTIFICATIONS
 endif
 ifneq ($(filter m y,$(CONFIG_ILITEK_RESUME_BY_DDI)),)
-EXTRA_CFLAGS += -DILI_CONFIG_RESUME_BY_DDI
+	ccflags-y += -DILI_CONFIG_RESUME_BY_DDI
 endif
 ifneq ($(filter m y,$(CONFIG_ILITEK_FW_PANEL)),)
-EXTRA_CFLAGS += -DILI_FW_PANEL
+	ccflags-y += -DILI_FW_PANEL
 endif
 ifneq ($(filter m y,$(CONFIG_ILITEK_SUSPEND_PWROFF)),)
-EXTRA_CFLAGS += -DILI_SUSPEND_PWROFF
+	ccflags-y += -DILI_SUSPEND_PWROFF
 endif
 ifneq ($(filter m y,$(CONFIG_ILITEK_CHARGER)),)
-EXTRA_CFLAGS += -DILI_CONFIG_CHARGER
+	ccflags-y += -DILI_CONFIG_CHARGER
 endif
 ifneq ($(filter m y,$(CONFIG_ILITEK_ESD)),)
-EXTRA_CFLAGS += -DILI_CONFIG_ESD
+	ccflags-y += -DILI_CONFIG_ESD
 endif
 ifneq ($(filter m y,$(CONFIG_ILITEK_GESTURE)),)
-EXTRA_CFLAGS += -DILI_CONFIG_GESTURE
+	ccflags-y += -DILI_CONFIG_GESTURE
 endif
 
 ifneq ($(filter m y,$(CONFIG_INPUT_ILITEK_MMI_PEN_NOTIFIER)),)
 	KBUILD_EXTRA_SYMBOLS += $(CURDIR)/$(KBUILD_EXTMOD)/../../../misc/pen/$(GKI_OBJ_MODULE_DIR)/Module.symvers
-	EXTRA_CFLAGS += -DILITEK_PEN_NOTIFIER
+	ccflags-y += -DILITEK_PEN_NOTIFIER
 endif
 
 ifneq ($(filter m y,$(CONFIG_ILITEK_PANEL_GESTURE)),)
-EXTRA_CFLAGS += -DILI_CONFIG_PANEL_GESTURE
+	ccflags-y += -DILI_CONFIG_PANEL_GESTURE
 endif
 
 ifneq ($(filter m y,$(CONFIG_DRM_PANEL_EVENT_NOTIFICATIONS)),)
-    EXTRA_CFLAGS += -DCONFIG_DRM_PANEL_EVENT_NOTIFICATIONS
+	ccflags-y += -DCONFIG_DRM_PANEL_EVENT_NOTIFICATIONS
 endif
 
 ifneq ($(filter m y,$(CONFIG_ILITEK_PASSIVE_PEN)),)
-EXTRA_CFLAGS += -DILI_PASSIVE_PEN
+	ccflags-y += -DILI_PASSIVE_PEN
 endif
 
 ifneq ($(filter m y,$(CONFIG_ILI_TOUCH_LAST_TIME)),)
-	EXTRA_CFLAGS += -DILI_TOUCH_LAST_TIME
+	ccflags-y += -DILI_TOUCH_LAST_TIME
 endif
 
 ili9882_mmi-objs += ili9882.o
@@ -74,12 +74,12 @@ ili9882_mmi-objs += ili9882_hostdl.o
 ili9882_mmi-objs += ili9882_node.o
 ifneq ($(filter m y,$(CONFIG_INPUT_TOUCHSCREEN_MMI)),)
     KBUILD_EXTRA_SYMBOLS += $(CURDIR)/$(KBUILD_EXTMOD)/../touchscreen_mmi/$(GKI_OBJ_MODULE_DIR)/Module.symvers
-    EXTRA_CFLAGS += -DCONFIG_INPUT_TOUCHSCREEN_MMI
+    ccflags-y += -DCONFIG_INPUT_TOUCHSCREEN_MMI
     ili9882_mmi-objs += ili_mmi_class.o
 endif
 KBUILD_EXTRA_SYMBOLS += $(CURDIR)/../../kernel/msm-$(MODULE_KERNEL_VERSION)/Module.symvers
 
 ifneq ($(filter m y,$(CONFIG_GTP_DDA_STYLUS)),)
-    EXTRA_CFLAGS += -DCONFIG_MOTO_DDA_PASSIVESTYLUS
+    ccflags-y += -DCONFIG_MOTO_DDA_PASSIVESTYLUS
     ili9882_mmi-objs += moto_ts_dda.o
 endif

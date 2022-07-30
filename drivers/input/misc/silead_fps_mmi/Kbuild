@@ -16,6 +16,5 @@ endif
 
 silead_fps_mmi-y += silead_fp.o
 
-
-obj-m += silead_fps_mmi.o
+obj-$(CONFIG_INPUT_SILEAD_FPS_MMI) += silead_fps_mmi.o
 

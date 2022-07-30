@@ -2,4 +2,4 @@
 EXTRA_CFLAGS += -Wall
 EXTRA_CFLAGS += -I$(ANDROID_BUILD_TOP)/motorola/kernel/modules/include
 
-obj-m += mmi-smbcharger-iio.o
+obj-$(CONFIG_MMI_SMBCHARGER_IIO) += mmi-smbcharger-iio.o
