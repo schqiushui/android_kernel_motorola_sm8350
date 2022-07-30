@@ -274,12 +274,43 @@ snd-soc-wm9712-objs := wm9712.o
 snd-soc-wm9713-objs := wm9713.o
 snd-soc-wm-hubs-objs := wm_hubs.o
 snd-soc-zx-aud96p22-objs := zx_aud96p22.o
+
+snd-soc-tas2560-objs := tas2560-core.o tas2560-misc.o tas2560-codec.o tas2560-regmap.o
+snd-soc-tas2560_algo-objs := tas2560-algo.o
+snd-soc-tas2560_calib-objs := tas2560-calib.o
+snd-soc-tas2562-objs := tas2562-codec.o tas2562-regmap.o tas25xx-algo.o tas25xx-calib.o
+snd-soc-snd_smartpa_aw882xx-objs := aw882xx.o
+snd-soc-tfa9874-objs := tfa98xx.o tfa_container.o tfa_dsp.o tfa_init.o
+ifdef TFA_DEBUG
+ccflags-y += -DTFA_DEBUG -DDEBUG
+snd-soc-tfa9874-objs += tfa_debug.o
+endif
 # Amp
 snd-soc-max9877-objs := max9877.o
 snd-soc-max98504-objs := max98504.o
 snd-soc-simple-amplifier-objs := simple-amplifier.o
 snd-soc-tpa6130a2-objs := tpa6130a2.o
 snd-soc-tas2552-objs := tas2552.o
+
+ifneq ($(CONFIG_SND_SOC_CS35L41)$(CONFIG_SND_SOC_CS35L45)$(CONFIG_SND_SOC_CS42L42),)
+ccflags-y += -I$(srctree)/techpack/audio/include
+ccflags-y += -I$(srctree)/techpack/audio/include/uapi
+endif
+ifdef CONFIG_SND_SOC_CS35L41_I2C
+cirrus_cs35l41-objs := cs35l41.o cs35l41-tables.o cs35l41-i2c.o
+else
+cirrus_cs35l41-objs := cs35l41.o cs35l41-tables.o cs35l41-spi.o
+endif
+
+ifdef CONFIG_SND_SOC_CS35L45_I2C
+cirrus_cs35l45-objs := cs35l45.o cs35l45-tables.o cs35l45-i2c.o
+else
+cirrus_cs35l45-objs := cs35l45.o cs35l45-tables.o cs35l45-spi.o
+endif
+
+cirrus_cs42l42-objs = cs42l42.o
+
+cirrus_wm_adsp-objs = wm_adsp.o
 
 obj-$(CONFIG_SND_SOC_88PM860X)	+= snd-soc-88pm860x.o
 obj-$(CONFIG_SND_SOC_AB8500_CODEC)	+= snd-soc-ab8500-codec.o
@@ -558,8 +589,20 @@ obj-$(CONFIG_SND_SOC_WM_ADSP)	+= snd-soc-wm-adsp.o
 obj-$(CONFIG_SND_SOC_WM_HUBS)	+= snd-soc-wm-hubs.o
 obj-$(CONFIG_SND_SOC_ZX_AUD96P22) += snd-soc-zx-aud96p22.o
 
+obj-$(CONFIG_SND_SOC_TAS2560) += snd-soc-tas2560.o
+obj-$(CONFIG_SND_SOC_TAS2560_ALGO) += snd-soc-tas2560_algo.o
+obj-$(CONFIG_SND_SOC_TAS2560_CALIB) += snd-soc-tas2560_calib.o
+obj-$(CONFIG_SND_SOC_SMARTPA_AW882xx) += snd-soc-snd_smartpa_aw882xx.o
+obj-$(CONFIG_SND_SOC_TFA9874) += snd-soc-tfa9874.o
+
 # Amp
 obj-$(CONFIG_SND_SOC_MAX9877)	+= snd-soc-max9877.o
 obj-$(CONFIG_SND_SOC_MAX98504)	+= snd-soc-max98504.o
 obj-$(CONFIG_SND_SOC_SIMPLE_AMPLIFIER)	+= snd-soc-simple-amplifier.o
 obj-$(CONFIG_SND_SOC_TPA6130A2)	+= snd-soc-tpa6130a2.o
+
+obj-$(CONFIG_SND_SOC_CS35L41)	+= cirrus_cs35l41.o
+obj-$(CONFIG_SND_SOC_CS35L45)   += cirrus_cs35l45.o
+obj-$(CONFIG_SND_SOC_CS42L42)   += cirrus_cs42l42.o
+obj-$(CONFIG_SND_SOC_CIRRUS_WM_ADSP)	+= cirrus_wm_adsp.o
+

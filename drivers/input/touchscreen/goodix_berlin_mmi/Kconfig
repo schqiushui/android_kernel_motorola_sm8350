@@ -1,6 +1,7 @@
 #
 # Goodix touchscreen driver configuration
 #
+
 menuconfig TOUCHSCREEN_GOODIX_BRL
 	tristate "Goodix berlin touchscreen"
 	help
@@ -16,5 +17,27 @@ config TOUCHSCREEN_GOODIX_BRL_SPI
 	bool "support SPI bus connection"
 	help
 		Say Y here if the touchscreen is connected via SPI bus.
+
+config GTP_FOD
+	bool "supports FOD"
+	help
+		Say Y here to support FOD.
+
+config GTP_LIMIT_USE_SUPPLIER
+	bool "supports using supplier"
+	help
+		Say Y here to support using supplier.
+
+config GTP_ENABLE_PM_QOS
+	bool "GTP enable PM QOS"
+
+config GOODIX_ESD_ENABLE
+	bool "Goodix ESD enable"
+
+config GTP_DDA_STYLUS
+	bool "GTP DDA Stylus"
+
+config BOARD_USES_DOUBLE_TAP_CTRL
+	bool "Board uses Double Tap Control"
 
 endif
