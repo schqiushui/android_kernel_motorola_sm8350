@@ -1,0 +1,21 @@
+diff a/sound/soc/codecs/cs35l41.c b/sound/soc/codecs/cs35l41.c	(rejected hunks)
+@@ -1952,6 +1955,7 @@ static const struct snd_soc_dapm_widget cs35l41_dapm_widgets[] = {
+ 	SND_SOC_DAPM_SWITCH("DRE", SND_SOC_NOPM, 0, 0, &dre_ctrl),
+ 	SND_SOC_DAPM_SWITCH("VBSTMON Output", SND_SOC_NOPM, 0, 0,
+ 						&vbstmon_out_ctrl),
++	SND_SOC_DAPM_SWITCH("AMP Enable", SND_SOC_NOPM, 0, 1, &amp_enable_ctrl),
+ };
+ 
+ static const struct snd_soc_dapm_widget cs35l41_hib_widgets[] = {
+@@ -2042,8 +2046,9 @@ static const struct snd_soc_dapm_route cs35l41_audio_map[] = {
+ 	{"DSP1", NULL, "VPMON ADC"},
+ 	{"DSP1", NULL, "TEMPMON ADC"},
+ 
+-	{"ASPRX1", NULL, "AMP Playback"},
+-	{"ASPRX2", NULL, "AMP Playback"},
++	{"AMP Enable", "Switch", "AMP Playback"},
++	{"ASPRX1", NULL, "AMP Enable"},
++	{"ASPRX2", NULL, "AMP Enable"},
+ 	{"DRE", "DRE Switch", "CLASS H"},
+ 	{"Main AMP", NULL, "CLASS H"},
+ 	{"Main AMP", NULL, "DRE"},
