@@ -20,7 +20,7 @@
 #include <linux/mmi_relay.h>
 
 #if defined(CONFIG_DRM_DYNAMIC_REFRESH_RATE)
-extern struct blocking_notifier_head dsi_freq_head;
+struct blocking_notifier_head dsi_freq_head;
 #define register_dynamic_refresh_rate_notifier(_nb) \
 	blocking_notifier_chain_register(&dsi_freq_head, _nb)
 #define unregister_dynamic_refresh_rate_notifier(_nb) \
