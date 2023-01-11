@@ -2571,8 +2571,10 @@ static int dsi_panel_parse_cmd_sets(
 
 	for (i = DSI_CMD_SET_PRE_ON; i < DSI_CMD_SET_MAX; i++) {
 		set = &priv_info->cmd_sets[i];
-		set->type = i;
-		set->count = 0;
+		if (!set->cmds) {
+			set->type = i;
+			set->count = 0;
+		}
 
 		if (i == DSI_CMD_SET_PPS) {
 			rc = dsi_panel_alloc_cmd_packets(set, 1);
