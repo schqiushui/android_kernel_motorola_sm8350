@@ -341,6 +341,7 @@ struct dsi_panel {
 	struct drm_panel_esd_config esd_config;
 
 	struct dsi_panel_lhbm_config lhbm_config;
+	bool fod_hbm_enabled;
 
 	struct dsi_parser_utils utils;
 
