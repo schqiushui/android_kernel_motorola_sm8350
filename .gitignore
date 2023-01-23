@@ -151,5 +151,12 @@ x509.genkey
 arch/*/configs/vendor/*_defconfig
 
 # vendor device tree directories
-arch/arm64/boot/dts/vendor
-arch/arm/boot/dts/vendor
+#arch/arm64/boot/dts/vendor
+#arch/arm/boot/dts/vendor
+
+# Kernel compilation output directory
+out/
+
+# Build script and changelog generator
+buildkernel.sh
+clean.sh
