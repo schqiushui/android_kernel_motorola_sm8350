@@ -817,6 +817,8 @@ static bool dsi_panel_set_hbm_backlight(struct dsi_panel *panel, u32 *bl_lvl)
 	return false;
 }
 
+static int dsi_panel_apply_hbm_status(struct dsi_panel *panel);
+
 int dsi_panel_set_backlight(struct dsi_panel *panel, u32 bl_lvl)
 {
 	int rc = 0;
@@ -865,6 +867,9 @@ int dsi_panel_set_backlight(struct dsi_panel *panel, u32 bl_lvl)
 
 skip_set:
 	bl->real_bl_level = bl_lvl;
+
+	if (panel->fod_hbm_enabled)
+		dsi_panel_apply_hbm_status(panel);
 
 	return rc;
 }
