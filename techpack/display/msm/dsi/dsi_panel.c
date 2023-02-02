@@ -4503,6 +4503,11 @@ static int dsi_panel_set_dc_dimming_status(struct dsi_panel *panel, bool status)
 	return rc;
 }
 
+static int dsi_panel_apply_dc_dimming_status(struct dsi_panel *panel)
+{
+	return dsi_panel_set_dc_dimming_status(panel, panel->dc_dimming_enabled);
+}
+
 static ssize_t sysfs_hbm_read(struct device *dev,
 			      struct device_attribute *attr,
 			      char *buf)
@@ -6212,6 +6217,12 @@ int dsi_panel_post_enable(struct dsi_panel *panel)
 
 	if (panel->hbm_enabled) {
 		rc = dsi_panel_apply_hbm_status(panel);
+		if (rc)
+			goto error;
+	}
+
+	if (panel->dc_dimming_enabled) {
+		rc = dsi_panel_apply_dc_dimming_status(panel);
 		if (rc)
 			goto error;
 	}
