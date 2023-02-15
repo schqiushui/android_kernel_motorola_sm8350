@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2011-2020 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
@@ -127,8 +128,14 @@ QDF_STATUS csr_neighbor_roam_update_fast_roaming_enabled(struct mac_context *mac
 						const bool fast_roam_enabled)
 {
 	QDF_STATUS qdf_status = QDF_STATUS_SUCCESS;
-	tpCsrNeighborRoamControlInfo neighbor_roam_info =
-		&mac_ctx->roam.neighborRoamInfo[session_id];
+	tpCsrNeighborRoamControlInfo neighbor_roam_info;
+	struct csr_roam_session *session = CSR_GET_SESSION(mac_ctx, session_id);
+
+	if (!session) {
+		sme_err("session_id invalid %d", session_id);
+		return QDF_STATUS_E_FAILURE;
+	}
+	neighbor_roam_info = &mac_ctx->roam.neighborRoamInfo[session_id];
 
 	switch (neighbor_roam_info->neighborRoamState) {
 	case eCSR_NEIGHBOR_ROAM_STATE_CONNECTED:
@@ -610,14 +617,7 @@ void csr_roam_reset_roam_params(struct mac_context *mac_ctx)
 static void csr_roam_restore_default_config(struct mac_context *mac_ctx,
 					    uint8_t vdev_id)
 {
-	struct wlan_roam_triggers triggers;
-
 	sme_set_roam_config_enable(MAC_HANDLE(mac_ctx), vdev_id, 0);
-
-	triggers.vdev_id = vdev_id;
-	triggers.trigger_bitmap = wlan_mlme_get_roaming_triggers(mac_ctx->psoc);
-	sme_debug("Reset roam trigger bitmap to 0x%x", triggers.trigger_bitmap);
-	wlan_cm_rso_set_roam_trigger(mac_ctx->pdev, vdev_id, &triggers);
 	sme_roam_control_restore_default_config(MAC_HANDLE(mac_ctx),
 						vdev_id);
 }
