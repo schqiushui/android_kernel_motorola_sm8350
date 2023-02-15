@@ -143,7 +143,7 @@ if BLOCK
 menu "DOS/FAT/EXFAT/NT Filesystems"
 
 source "fs/fat/Kconfig"
-source "fs/exfat/Kconfig"
+source "fs/exfat-linux/Kconfig"
 source "fs/ntfs/Kconfig"
 
 endmenu
