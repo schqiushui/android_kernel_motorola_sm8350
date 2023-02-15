@@ -38,6 +38,6 @@ config DRM_PANEL_NOTIFICATIONS
 	 Say Y here if your panel includes support for drm notifications.
 	 If unsure, say N.
 
-config TS_KERNEL_USE_GKI
-        bool "Touchscreen GKI"
+config BOARD_USES_DOUBLE_TAP_CTRL
+	bool "Board uses Double Tap Control"
 
