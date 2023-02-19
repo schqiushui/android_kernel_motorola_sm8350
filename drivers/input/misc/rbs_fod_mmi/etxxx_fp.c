@@ -1095,7 +1095,6 @@ static int egisfp_fb_callback(struct notifier_block *nb, unsigned long val, void
 {
 	struct egisfp_dev_t *egis_dev = NULL;
 	char *envp[2];
-	int ret = 0;
 #if defined(CONFIG_PANEL_NOTIFICATIONS)
 	INFO_PRINT(" %s : got notify value = %d \n", __func__, (int)val);
 	egis_dev = container_of(nb, struct egisfp_dev_t, notifier);
@@ -1118,8 +1117,8 @@ static int egisfp_fb_callback(struct notifier_block *nb, unsigned long val, void
 	}
 	if(val == FP_NOTIFY_ON ||val == FP_NOTIFY_OFF){
 		envp[1] = NULL;
-		ret = kobject_uevent_env(&egis_dev->dd->dev.kobj, KOBJ_CHANGE, envp);
-		INFO_PRINT(" %s : screen_onoff = %d val=%lu ret=%d\n", __func__, egis_dev->screen_onoff, val,ret);
+		kobject_uevent_env(&egis_dev->dd->dev.kobj, KOBJ_CHANGE, envp);
+		INFO_PRINT(" %s : screen_onoff = %d val=%lu\n", __func__, egis_dev->screen_onoff, val);
 	}
 #elif defined(CONFIG_DRM_PANEL_NOTIFICATIONS) && (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 19, 0))
 	struct drm_panel_notifier *evdata = data;
@@ -1149,7 +1148,7 @@ static int egisfp_fb_callback(struct notifier_block *nb, unsigned long val, void
 	}
 	INFO_PRINT(" %s : screen_onoff = %d \n", __func__, egis_dev->screen_onoff);
 	envp[1] = NULL;
-	ret = kobject_uevent_env(&egis_dev->dd->dev.kobj, KOBJ_CHANGE, envp);
+	kobject_uevent_env(&egis_dev->dd->dev.kobj, KOBJ_CHANGE, envp);
 #else
 	struct fb_event *evdata = data;
 	unsigned int blank;
@@ -1176,7 +1175,7 @@ static int egisfp_fb_callback(struct notifier_block *nb, unsigned long val, void
 		}
 		INFO_PRINT(" %s : screen_onoff = %d \n", __func__, egis_dev->screen_onoff);
 		envp[1] = NULL;
-		ret = kobject_uevent_env(&egis_dev->dd->dev.kobj, KOBJ_CHANGE, envp);
+		kobject_uevent_env(&egis_dev->dd->dev.kobj, KOBJ_CHANGE, envp);
 	}
 #endif
 	return NOTIFY_OK;
