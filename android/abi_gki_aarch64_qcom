@@ -2468,6 +2468,7 @@
   strrchr
   strreplace
   strscpy
+  strscpy_pad
   strsep
   strspn
   strstr
