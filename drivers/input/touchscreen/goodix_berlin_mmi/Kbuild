@@ -105,4 +105,6 @@ else ifneq ($(filter zeekr%, $(USE_TARGET_PRODUCT)), )
         ccflags-y += -DPRODUCT_ZEEKR
 else ifneq ($(filter lynkco%, $(USE_TARGET_PRODUCT)), )
         ccflags-y += -DPRODUCT_LYNKCO
+else ifneq ($(filter bangkk%, $(USE_TARGET_PRODUCT)), )
+        ccflags-y += -DPRODUCT_BANGKK
 endif
