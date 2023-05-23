@@ -1,6 +1,8 @@
 # add -Wall to try to catch everything we can.
 EXTRA_CFLAGS += -Wall
-ccflags-y := -I$(srctree)/drivers/power/mmi_charger
+ccflags-y += -I$(srctree)/include
+ccflags-y += -I$(srctree)/drivers/power/mmi_charger
+ccflags-y += -I$(srctree)/drivers/power/mmi_discrete_charger
 
 mmi_discrete_charger-objs += mmi_discrete_charger_core.o
 mmi_discrete_charger-objs += mmi_discrete_charger_iio.o
