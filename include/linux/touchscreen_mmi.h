@@ -253,7 +253,8 @@ enum touch_event_mode {
 	TS_COORDINATE_ACTION_NONE = 0,
 	TS_COORDINATE_ACTION_PRESS,
 	TS_COORDINATE_ACTION_RELEASE,
-	TS_COORDINATE_ACTION_MOVE
+	TS_COORDINATE_ACTION_MOVE,
+	TS_COORDINATE_ACTION_FORCE_LIFT
 };
 
 enum TS_FW_UPGRADE_MODE {
@@ -277,6 +278,11 @@ struct gesture_event_data {
 	};
 };
 
+struct touch_clip_area {
+	unsigned xUL, yUL, xBR, yBR;
+	bool inversion; /* clip inside (when true) or outside otherwise */
+};
+
 /**
  * struct touchscreen_mmi_class_methods - export class methods to vendor
  *
@@ -289,6 +295,7 @@ struct ts_mmi_class_methods {
 	int     (*get_class_fname)(struct device *dev , const char **fname);
 	int     (*get_supplier)(struct device *dev , const char **sname);
 	int     (*report_touch_event)(struct touch_event_data *tev, struct input_dev *input_dev);
+	int     (*clip_touch_event)(struct device *dev, struct touch_event_data *tev, struct input_dev *input_dev);
 	int     (*report_liquid_detection_status)(struct device *parent, int status);
 	struct kobject *kobj_notify;
 };
@@ -451,6 +458,7 @@ struct ts_mmi_dev_pdata {
 	bool		poison_slot_ctrl;
 	bool		active_region_ctrl;
 	bool		support_liquid_detection;
+	bool		clip_area_ctrl;
 	int		max_x;
 	int		max_y;
 	int		fod_x;
@@ -557,6 +565,7 @@ struct ts_mmi_dev {
 	int			update_baseline;
 	struct attribute_group	*extern_group;
 	struct list_head	node;
+	struct touch_clip_area clip;
 
 	bool			double_tap_pressed;
 	bool			udfps_pressed;
