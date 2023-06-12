@@ -100,6 +100,7 @@ struct dp_io {
  * @state_active: active state pin control
  * @state_hpd_active: hpd active state pin control
  * @state_suspend: suspend state pin control
+ * @state_bl_pwm: backlight pwm pin control
  */
 struct dp_pinctrl {
 	struct pinctrl *pin;
@@ -108,6 +109,7 @@ struct dp_pinctrl {
 	struct pinctrl_state *state_hpd_tlmm;
 	struct pinctrl_state *state_hpd_ctrl;
 	struct pinctrl_state *state_suspend;
+	struct pinctrl_state *state_bl_pwm;
 };
 
 #define DP_ENUM_STR(x)	#x
@@ -264,6 +266,7 @@ struct dp_parser {
 	bool has_widebus;
 	bool gpio_aux_switch;
 	bool lphw_hpd;
+	bool panel_notifier_support;
 	u32 mst_fixed_port[MAX_DP_MST_STREAMS];
 	u32 pixel_base_off[MAX_DP_MST_STREAMS];
 	const char *mst_fixed_display_type[MAX_DP_MST_STREAMS];
