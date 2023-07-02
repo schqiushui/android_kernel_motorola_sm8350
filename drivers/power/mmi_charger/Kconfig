@@ -7,3 +7,6 @@ config USE_MMI_CHARGER
 
          This driver can also be built as a module.  If so, the module
          will be called mmi_charger.
+
+config MMI_RECHARGER_HAWAO_MODE
+	bool "MMI Recharger HAWAO Mode"
