@@ -229,7 +229,6 @@ static const struct dp_display_type_info dp_info = {
 
 static const struct dp_display_type_info edp_info = {
 	.display_type = DRM_MODE_CONNECTOR_eDP,
->>>>>>> 368608651a1ba58867373677c83d026de9cd6c49
 };
 
 static const struct of_device_id dp_dt_match[] = {
