@@ -122,3 +122,4 @@ obj-$(CONFIG_TOUCHSCREEN_FTS_TS)	+= stmicro_mmi/
 obj-$(CONFIG_TOUCHSCREEN_GOODIX_BRL)	+= goodix_berlin_mmi/
 obj-$(CONFIG_TOUCHSCREEN_ILITEK_CHIPSET_MMI)	+= ili9882_mmi/
 obj-$(CONFIG_TOUCHSCREEN_NT36xxx_HOSTDL_SPI_MMI)	+= nova_0flash_mmi/
+obj-$(CONFIG_TOUCHSCREEN_NT36xxx_HOSTDL_SPI_MMI_V1)	+= nova_0flash_mmi_v1/
