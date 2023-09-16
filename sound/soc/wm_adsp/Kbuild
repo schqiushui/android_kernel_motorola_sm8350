@@ -1,0 +1,5 @@
+# add -Wall to try to catch everything we can.
+EXTRA_CFLAGS += -Wall
+
+cirrus_wm_adsp-objs = wm_adsp.o
+obj-m += cirrus_wm_adsp.o
