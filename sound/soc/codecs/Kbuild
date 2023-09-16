@@ -69,3 +69,28 @@ obj-m += tas2562.o
 
 snd_smartpa_aw882xx-objs = aw882xx.o
 obj-m += snd_smartpa_aw882xx.o
+
+EXTRA_CFLAGS += \
+	-I$(ANDROID_BUILD_TOP)/vendor/cirrus/audio/dlkm/include \
+	-I$(ANDROID_BUILD_TOP)/vendor/cirrus/audio/dlkm/sound/soc/wm_adsp
+
+ifneq ($(filter m y,$(CONFIG_SND_SOC_CS35L41_I2C)),)
+cirrus_cs35l41-objs = cs35l41.o cs35l41-tables.o cs35l41-i2c.o
+else
+cirrus_cs35l41-objs = cs35l41.o cs35l41-tables.o cs35l41-spi.o
+endif
+obj-m += cirrus_cs35l41.o
+
+ifneq (,$(filter dubai% banks%, $(TARGET_PRODUCT)))
+ifneq ($(filter m y,$(CONFIG_SND_SOC_CS35L45_I2C)),)
+cirrus_cs35l45-objs = cs35l45.o cs35l45-tables.o cs35l45-i2c.o
+else
+cirrus_cs35l45-objs = cs35l45.o cs35l45-tables.o cs35l45-spi.o
+endif
+obj-m += cirrus_cs35l45.o
+endif
+
+KBUILD_EXTRA_SYMBOLS += $(CURDIR)/$(KBUILD_EXTMOD)/../wm_adsp/Module.symvers
+
+cirrus_cs42l42-objs = cs42l42.o
+obj-m += cirrus_cs42l42.o
