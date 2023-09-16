@@ -663,6 +663,7 @@ struct csr_roam_profile {
 	tCsrKeys Keys;
 	tCsrChannelInfo ChannelInfo;
 	uint32_t op_freq;
+	uint32_t freq_hint;
 	struct ch_params ch_params;
 	/* If this is 0, SME will fill in for caller. */
 	uint16_t beaconInterval;
