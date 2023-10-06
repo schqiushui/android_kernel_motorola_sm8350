@@ -1,4 +1,4 @@
-config FINGERPRINT_EGISTEC_FPS_MMI
+config INPUT_EGISTEC_FPS_MMI
 	tristate "Egistec fingerprint sensor MMI"
 	default n
 	help

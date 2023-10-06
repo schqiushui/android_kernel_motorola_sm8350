@@ -14,4 +14,4 @@ endif
 
 rbs_fod_mmi-y += etxxx_fp.o
 
-obj-$(CONFIG_RBS_FOD_MMI) += rbs_fod_mmi.o
+obj-$(CONFIG_INPUT_EGIS_FOD_MMI) += rbs_fod_mmi.o

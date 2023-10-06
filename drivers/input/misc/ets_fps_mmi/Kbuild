@@ -20,7 +20,7 @@ ifeq ($(TARGET_BUILD_VARIANT),userdebug)
 	ccflags-y += -DFP_SPI_DEBUG
 endif
 
-obj-$(CONFIG_FINGERPRINT_EGISTEC_FPS_MMI) := ets_fps_mmi.o
+obj-$(CONFIG_INPUT_EGISTEC_FPS_MMI) := ets_fps_mmi.o
 
 ifneq ($(filter doha%, $(TARGET_PRODUCT)),)
 	ccflags-y += -DCONFIG_INPUT_EGISTEC_FPS_POSE=0

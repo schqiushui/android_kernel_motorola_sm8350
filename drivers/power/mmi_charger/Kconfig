@@ -1,5 +1,5 @@
 config USE_MMI_CHARGER
-        tristate "MMI CHARGER"
+        tristate "MMI Charger"
         default n
         help
          Say Y here if you have a mmi charger compatible
