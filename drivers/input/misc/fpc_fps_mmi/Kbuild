@@ -17,5 +17,5 @@ endif
 
 fpc1020_mmi-y += fpc1020_tee.o
 
-obj-$(CONFIG_FPC_FPS_MMI) += fpc1020_mmi.o
+obj-$(CONFIG_INPUT_MISC_FPC1020) += fpc1020_mmi.o
 

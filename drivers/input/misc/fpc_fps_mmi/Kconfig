@@ -1,15 +1,16 @@
-config FPC_FPS_MMI
-	tristate "FPC FPS MMI"
+config INPUT_MISC_FPC1020
+	tristate "FPC fingerprint sensor MMI"
 	default n
 	help
-	 Say Y here if you wish to include support
+	 Say Y here if you wish to include support for MMI FPC finger print sensor.
 	 If unsure, say N.
 
 config INPUT_MISC_FPC1020_SAVE_TO_CLASS_DEVICE
-        bool "FPC1020 Save to Class Device"
-        default n
-        depends on FPC_FPS_MMI
-        help
-         Say Y here if you wish to include support
+	bool "FPC fingerprint sensor MMI sysfs support"
+	default n
+	depends on INPUT_MISC_FPC1020
+	help
+	 Say Y here if you wish to include support for MMI FPC finger print sensor
          sysfs.
-         If unsure, say N.
+	 If unsure, say N.
+

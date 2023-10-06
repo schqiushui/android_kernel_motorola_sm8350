@@ -11,4 +11,4 @@ $(warning define SUPPORT_POWER_GPIO)
 EXTRA_CFLAGS += -DSUPPORT_POWER_GPIO
 endif
 
-obj-m += fpsensor_spi_tee.o
+obj-$(CONFIG_INPUT_CHIPONE_FPS_SPI) += fpsensor_spi_tee.o

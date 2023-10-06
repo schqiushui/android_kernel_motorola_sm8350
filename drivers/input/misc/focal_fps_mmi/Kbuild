@@ -44,6 +44,4 @@ ifneq ($(filter m y, $(CONFIG_FOCAL_PANEL_NOTIFICATIONS)),)
 	EXTRA_CFLAGS += -DCONFIG_PANEL_NOTIFICATIONS
 endif
 
-obj-m += focal_fps_mmi.o
-
-
+obj-$(CONFIG_INPUT_FOCAL_FPS_MMI) += focal_fps_mmi.o

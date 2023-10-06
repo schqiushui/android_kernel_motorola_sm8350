@@ -88,8 +88,12 @@ obj-$(CONFIG_INPUT_XEN_KBDDEV_FRONTEND)	+= xen-kbdfront.o
 obj-$(CONFIG_INPUT_YEALINK)		+= yealink.o
 obj-$(CONFIG_INPUT_IDEAPAD_SLIDEBAR)	+= ideapad_slidebar.o
 
-obj-$(CONFIG_FPC_FPS_MMI)   		+= fpc_fps_mmi/
-obj-$(CONFIG_FINGERPRINT_GOODIX_FOD_MMI) += goodix_fod_mmi/
-obj-$(CONFIG_RBS_FPS_MMI)   		+= rbs_fps_mmi/
-obj-$(CONFIG_RBS_FOD_MMI)   		+= rbs_fod_mmi/
-obj-$(CONFIG_FINGERPRINT_EGISTEC_FPS_MMI) += ets_fps_mmi/
+obj-$(CONFIG_INPUT_CHIPONE_FPS_SPI)	+= chipone_fps_mmi/
+obj-$(CONFIG_INPUT_EGISTEC_FPS_MMI)	+= ets_fps_mmi/
+obj-$(CONFIG_INPUT_FOCAL_FPS_MMI)	+= focal_fps_mmi/
+obj-$(CONFIG_INPUT_MISC_FPC1020)	+= fpc_fps_mmi/
+obj-$(CONFIG_INPUT_EGIS_FOD_MMI)	+= rbs_fod_mmi/
+obj-$(CONFIG_INPUT_EGIS_FPS_MMI)	+= rbs_fps_mmi/
+obj-$(CONFIG_INPUT_SILEAD_FPS_MMI)	+= silead_fps_mmi/
+obj-$(CONFIG_INPUT_QPNP_POWER_ON_MMI)	+= qpnp_power_on_mmi/
+obj-$(CONFIG_INPUT_GOODIX_FOD_MMI)	+= goodix_fod_mmi/

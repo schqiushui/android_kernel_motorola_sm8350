@@ -13,7 +13,7 @@ menuconfig TOUCHSCREEN_NT36xxx_HOSTDL_SPI_MMI
 if TOUCHSCREEN_NT36xxx_HOSTDL_SPI_MMI
 
 config INPUT_NOVA_0FLASH_MMI_ENABLE_DOUBLE_TAP
-	bool "Moto Novatek NT36xxx Doubel tap"
+	bool "Moto Novatek NT36xxx Double tap"
 	depends on TOUCHSCREEN_NT36xxx_HOSTDL_SPI_MMI
 	default n
 	help
