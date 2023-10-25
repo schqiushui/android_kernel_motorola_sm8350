@@ -16,6 +16,7 @@ obj-$(CONFIG_QPNP_SMB_BASIC_CHARGER)	+= qpnp_smb_basic_charger/
 obj-$(CONFIG_QTI_GLINK_CHARGER)	+= qti_glink_charger/
 obj-$(CONFIG_RT9426A_FG_MMI)	+= rt9426a_fg_mmi/
 obj-$(CONFIG_SD77426_FG_MMI)	+= sd77426_fg_mmi/
+obj-$(CONFIG_SGM4154X_CHARGER_LITE)	+= sgm4154x_charger_lite/
 obj-$(CONFIG_SGM4154X_CHARGER_MMI)	+= sgm4154x_chg_mmi/
 obj-$(CONFIG_SM5602_FG_MMI)	+= sm5602_fg_mmi/
 obj-$(CONFIG_USE_MMI_CHARGER)	+= mmi_charger/

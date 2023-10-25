@@ -17,6 +17,7 @@ source "drivers/power/qpnp_smb_basic_charger/Kconfig"
 source "drivers/power/qti_glink_charger/Kconfig"
 source "drivers/power/rt9426a_fg_mmi/Kconfig"
 source "drivers/power/sd77426_fg_mmi/Kconfig"
+source "drivers/power/sgm4154x_charger_lite/Kconfig"
 source "drivers/power/sgm4154x_chg_mmi/Kconfig"
 source "drivers/power/sm5602_fg_mmi/Kconfig"
 
