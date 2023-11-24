@@ -232,8 +232,8 @@ static int ufshid_get_analyze_and_issue_execute(struct ufshid_dev *hid)
 	bool flag_val;
 	int frag_level;
 if(IS_MICRON_DEVICE(storage_mfrid)){
-	if (ufshid_read_attr(hid, QUERY_ATTR_IDN_HID_FRAG_STATUS, &frag_level))
-		return -EINVAL;
+	    if (ufshid_read_attr(hid, QUERY_ATTR_IDN_HID_FRAG_STATUS, &frag_level))
+		    return -EINVAL;
 		if (ufshid_read_attr(hid, QUERY_ATTR_IDN_HID_PROGRESS, &attr_val))
 			return -EINVAL;
 		if(attr_val != HID_PROG_ONGOING) {
