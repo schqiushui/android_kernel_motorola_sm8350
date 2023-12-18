@@ -274,7 +274,6 @@ typedef struct sCsrChnPower_ {
 
 typedef struct tagCsr11dinfo {
 	sCsrChannel Channels;
-	uint8_t countryCode[REG_ALPHA2_LEN + 1];
 	/* max power channel list */
 	sCsrChnPower ChnPower[CFG_VALID_CHANNEL_LIST_LEN];
 } tCsr11dinfo;
@@ -663,6 +662,7 @@ struct csr_roam_profile {
 	tCsrKeys Keys;
 	tCsrChannelInfo ChannelInfo;
 	uint32_t op_freq;
+	uint32_t freq_hint;
 	struct ch_params ch_params;
 	/* If this is 0, SME will fill in for caller. */
 	uint16_t beaconInterval;
