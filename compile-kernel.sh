@@ -295,13 +295,14 @@ zipper()
 
 	# Making sure everything is ok before making zip
 	cd "$AK3_DIR" || exit
-	make clean
+	find "$AK3_DIR" -name '*.ko' -exec rm -f {} \;
+	find "$AK3_DIR" -name 'modules.*' -exec rm -f {} \;
 	cd "$KERNEL_DIR" || exit
 
 	cp "$KERNEL_DIR"/work/"$TARGET" "$AK3_DIR"
 	find "$DTB_PATH" -name '*.dtb' -exec cat {} + > "$AK3_DIR"/dtb
 	cp "$DTB_PATH"/*.img "$AK3_DIR"/
-	if [[ $CONFIG_MODULES == "m" ]]; then
+	if [[ $CONFIG_MODULES == "y" ]]; then
 		MOD_PATH="work/modules/lib/modules/$MOD_NAME"
 		sed -i 's/\(kernel\/[^: ]*\/\)\([^: ]*\.ko\)/\/vendor\/lib\/modules\/\2/g' "$MOD_PATH"/modules.dep
 		sed -i 's/.*\///g' "$MOD_PATH"/modules.order
